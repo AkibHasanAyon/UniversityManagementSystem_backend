@@ -14,6 +14,12 @@ class Semester(models.Model):
     end_date = models.DateField()
     is_active = models.BooleanField(default=False)
 
+    def save(self, *args, **kwargs):
+        if self.is_active:
+            # Deactivate all other semesters
+            Semester.objects.exclude(pk=self.pk).update(is_active=False)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
 
@@ -21,6 +27,9 @@ class Classroom(models.Model):
     room_number = models.CharField(max_length=20)
     building = models.CharField(max_length=50)
     capacity = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ('building', 'room_number')
 
     def __str__(self):
         return f"{self.building} - {self.room_number}"

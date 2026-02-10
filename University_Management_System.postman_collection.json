@@ -1,0 +1,238 @@
+{
+    "info": {
+        "_postman_id": "8b5f3a0c-6e2b-4e3a-9c7d-0d6f3e1b7c2a",
+        "name": "University Management System (Refactored)",
+        "description": "Comprehensive API collection for the refactored University Management System.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "pm.environment.set(\"access_token\", jsonData.access);",
+                                    "pm.environment.set(\"refresh_token\", jsonData.refresh);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"admin1\",\n    \"password\": \"password\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "http://127.0.0.1:8000/api/auth/login/"
+                    }
+                },
+                {
+                    "name": "Refresh Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "http://127.0.0.1:8000/api/auth/refresh/"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Users",
+            "item": [
+                {
+                    "name": "List Users (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": "http://127.0.0.1:8000/api/users/users/"
+                    }
+                },
+                {
+                    "name": "List Students",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": "http://127.0.0.1:8000/api/users/students/"
+                    }
+                },
+                {
+                    "name": "List Faculty",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": "http://127.0.0.1:8000/api/users/faculty/"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "University",
+            "item": [
+                {
+                    "name": "List Departments",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": "http://127.0.0.1:8000/api/university/departments/"
+                    }
+                },
+                {
+                    "name": "List Semesters",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": "http://127.0.0.1:8000/api/university/semesters/"
+                    }
+                },
+                {
+                    "name": "List Classrooms",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": "http://127.0.0.1:8000/api/university/classrooms/"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Academic",
+            "item": [
+                {
+                    "name": "List Courses",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": "http://127.0.0.1:8000/api/academic/courses/"
+                    }
+                },
+                {
+                    "name": "List Schedules",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": "http://127.0.0.1:8000/api/academic/schedules/"
+                    }
+                },
+                {
+                    "name": "Enroll",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"schedule_id\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "http://127.0.0.1:8000/api/academic/enrollments/"
+                    }
+                },
+                {
+                    "name": "Submit Grade",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"enrollment_id\": 1,\n    \"grade\": \"A\",\n    \"score\": 95\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "http://127.0.0.1:8000/api/academic/grades/"
+                    }
+                },
+                {
+                    "name": "Get Transcript",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": "http://127.0.0.1:8000/api/academic/transcript/"
+                    }
+                }
+            ]
+        }
+    ]
+}
