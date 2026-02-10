@@ -36,7 +36,7 @@
                                 }
                             }
                         },
-                        "url": "http://127.0.0.1:8000/api/auth/login/"
+                        "url": "{{base_url}}/api/auth/login/"
                     }
                 },
                 {
@@ -53,7 +53,7 @@
                                 }
                             }
                         },
-                        "url": "http://127.0.0.1:8000/api/auth/refresh/"
+                        "url": "{{base_url}}/api/auth/refresh/"
                     }
                 }
             ]
@@ -71,7 +71,7 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "http://127.0.0.1:8000/api/users/users/"
+                        "url": "{{base_url}}/api/users/users/"
                     }
                 },
                 {
@@ -84,7 +84,7 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "http://127.0.0.1:8000/api/users/students/"
+                        "url": "{{base_url}}/api/users/students/"
                     }
                 },
                 {
@@ -97,7 +97,7 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "http://127.0.0.1:8000/api/users/faculty/"
+                        "url": "{{base_url}}/api/users/faculty/"
                     }
                 }
             ]
@@ -115,7 +115,7 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "http://127.0.0.1:8000/api/university/departments/"
+                        "url": "{{base_url}}/api/university/departments/"
                     }
                 },
                 {
@@ -128,7 +128,7 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "http://127.0.0.1:8000/api/university/semesters/"
+                        "url": "{{base_url}}/api/university/semesters/"
                     }
                 },
                 {
@@ -141,7 +141,7 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "http://127.0.0.1:8000/api/university/classrooms/"
+                        "url": "{{base_url}}/api/university/classrooms/"
                     }
                 }
             ]
@@ -159,7 +159,7 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "http://127.0.0.1:8000/api/academic/courses/"
+                        "url": "{{base_url}}/api/academic/courses/"
                     }
                 },
                 {
@@ -172,7 +172,7 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "http://127.0.0.1:8000/api/academic/schedules/"
+                        "url": "{{base_url}}/api/academic/schedules/"
                     }
                 },
                 {
@@ -194,7 +194,7 @@
                                 }
                             }
                         },
-                        "url": "http://127.0.0.1:8000/api/academic/enrollments/"
+                        "url": "{{base_url}}/api/academic/enrollments/"
                     }
                 },
                 {
@@ -216,7 +216,7 @@
                                 }
                             }
                         },
-                        "url": "http://127.0.0.1:8000/api/academic/grades/"
+                        "url": "{{base_url}}/api/academic/grades/"
                     }
                 },
                 {
@@ -229,10 +229,27 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "http://127.0.0.1:8000/api/academic/transcript/"
+                        "url": "{{base_url}}/api/academic/transcript/"
                     }
                 }
             ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8005",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "refresh_token",
+            "value": "",
+            "type": "string"
         }
     ]
 }
