@@ -6,19 +6,36 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_str, force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
+from .models import Student, Faculty
+
 User = get_user_model()
 
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Returns JWT tokens + user info matching frontend LoginPage expectations."""
+
     def validate(self, attrs):
         data = super().validate(attrs)
-        
-        # Add extra responses data
-        data['user'] = {
-            'id': self.user.id,
-            'email': self.user.email,
-            'role': self.user.role,
+        user = self.user
+
+        # Build the user response with role-specific ID
+        user_data = {
+            'role': user.role,
+            'name': user.get_full_name() or user.username,
+            'email': user.email,
         }
+
+        # Attach the role-specific ID
+        if user.role == 'student' and hasattr(user, 'student_profile'):
+            user_data['id'] = user.student_profile.student_id
+        elif user.role == 'faculty' and hasattr(user, 'faculty_profile'):
+            user_data['id'] = user.faculty_profile.faculty_id
+        elif user.role == 'admin':
+            user_data['id'] = f"ADM{user.pk:03d}"
+
+        data['user'] = user_data
         return data
+
 
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
@@ -31,7 +48,8 @@ class LogoutSerializer(serializers.Serializer):
         try:
             RefreshToken(self.token).blacklist()
         except TokenError:
-            pass # Token already invalid or blacklisted
+            pass
+
 
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -40,6 +58,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         if not User.objects.filter(email=value).exists():
             raise serializers.ValidationError("Account with this email does not exist.")
         return value
+
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
     token = serializers.CharField()
@@ -63,35 +82,134 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         self.user.save()
         return self.user
 
-from .models import Student, Faculty
 
-class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+# ─── Student Serializer (flat payload matching ManageStudents.jsx) ─────────
 
-    class Meta:
-        model = User
-        fields = ('id', 'email', 'username', 'password', 'role', 'is_active', 'date_joined')
-        read_only_fields = ('is_active', 'date_joined')
+class StudentSerializer(serializers.Serializer):
+    """
+    Accepts flat payload from frontend:
+    { student_id, name, email, password, major, year, gpa }
+    Creates/updates both User and Student records.
+    """
+    student_id = serializers.CharField(max_length=20)
+    name = serializers.CharField(max_length=150)
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, required=False)
+    major = serializers.CharField(max_length=100)
+    year = serializers.ChoiceField(choices=['1st', '2nd', '3rd', '4th'])
+    gpa = serializers.DecimalField(max_digits=4, decimal_places=2)
 
     def create(self, validated_data):
-        password = validated_data.pop('password')
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
-        return user
+        name = validated_data['name']
+        parts = name.split(' ', 1)
+        first_name = parts[0]
+        last_name = parts[1] if len(parts) > 1 else ''
 
-class StudentSerializer(serializers.ModelSerializer):
-    user_details = UserSerializer(source='user', read_only=True)
-    department_name = serializers.CharField(source='department.name', read_only=True)
-    
-    class Meta:
-        model = Student
-        fields = '__all__'
+        user = User.objects.create_user(
+            username=validated_data['email'],
+            email=validated_data['email'],
+            password=validated_data.get('password', 'changeme123'),
+            first_name=first_name,
+            last_name=last_name,
+            role='student',
+        )
+        student = Student.objects.create(
+            user=user,
+            student_id=validated_data['student_id'],
+            major=validated_data['major'],
+            year=validated_data['year'],
+            current_gpa=validated_data['gpa'],
+        )
+        return student
 
-class FacultySerializer(serializers.ModelSerializer):
-    user_details = UserSerializer(source='user', read_only=True)
-    department_name = serializers.CharField(source='department.name', read_only=True)
+    def update(self, instance, validated_data):
+        name = validated_data.get('name', instance.user.get_full_name())
+        parts = name.split(' ', 1)
+        instance.user.first_name = parts[0]
+        instance.user.last_name = parts[1] if len(parts) > 1 else ''
+        instance.user.email = validated_data.get('email', instance.user.email)
+        instance.user.username = validated_data.get('email', instance.user.email)
+        instance.user.save()
 
-    class Meta:
-        model = Faculty
-        fields = '__all__'
+        instance.student_id = validated_data.get('student_id', instance.student_id)
+        instance.major = validated_data.get('major', instance.major)
+        instance.year = validated_data.get('year', instance.year)
+        instance.current_gpa = validated_data.get('gpa', instance.current_gpa)
+        instance.save()
+        return instance
+
+    def to_representation(self, instance):
+        return {
+            'student_id': instance.student_id,
+            'name': instance.user.get_full_name(),
+            'email': instance.user.email,
+            'major': instance.major,
+            'year': instance.year,
+            'gpa': str(instance.current_gpa),
+        }
+
+
+# ─── Faculty Serializer (flat payload matching ManageFaculty.jsx) ──────────
+
+class FacultySerializer(serializers.Serializer):
+    """
+    Accepts flat payload from frontend:
+    { faculty_id, name, email, password, department, specialization, join_date }
+    Creates/updates both User and Faculty records.
+    """
+    faculty_id = serializers.CharField(max_length=20)
+    name = serializers.CharField(max_length=150)
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, required=False)
+    department = serializers.CharField(max_length=100)
+    specialization = serializers.CharField(max_length=200)
+    join_date = serializers.DateField()
+
+    def create(self, validated_data):
+        name = validated_data['name']
+        parts = name.split(' ', 1)
+        first_name = parts[0]
+        last_name = parts[1] if len(parts) > 1 else ''
+
+        user = User.objects.create_user(
+            username=validated_data['email'],
+            email=validated_data['email'],
+            password=validated_data.get('password', 'changeme123'),
+            first_name=first_name,
+            last_name=last_name,
+            role='faculty',
+        )
+        faculty = Faculty.objects.create(
+            user=user,
+            faculty_id=validated_data['faculty_id'],
+            department=validated_data['department'],
+            specialization=validated_data['specialization'],
+            join_date=validated_data['join_date'],
+        )
+        return faculty
+
+    def update(self, instance, validated_data):
+        name = validated_data.get('name', instance.user.get_full_name())
+        parts = name.split(' ', 1)
+        instance.user.first_name = parts[0]
+        instance.user.last_name = parts[1] if len(parts) > 1 else ''
+        instance.user.email = validated_data.get('email', instance.user.email)
+        instance.user.username = validated_data.get('email', instance.user.email)
+        instance.user.save()
+
+        instance.faculty_id = validated_data.get('faculty_id', instance.faculty_id)
+        instance.department = validated_data.get('department', instance.department)
+        instance.specialization = validated_data.get('specialization', instance.specialization)
+        instance.join_date = validated_data.get('join_date', instance.join_date)
+        instance.save()
+        return instance
+
+    def to_representation(self, instance):
+        return {
+            'faculty_id': instance.faculty_id,
+            'name': instance.user.get_full_name(),
+            'email': instance.user.email,
+            'department': instance.department,
+            'specialization': instance.specialization,
+            'join_date': str(instance.join_date),
+        }

@@ -1,115 +1,198 @@
 from rest_framework import serializers
-from .models import ClassSchedule, Enrollment, Course, Grade, Attendance
+from .models import Course, FacultyCourseAssignment, Enrollment, Grade
+from users.models import Student, Faculty
 
-class AttendanceSerializer(serializers.ModelSerializer):
-    student_name = serializers.CharField(source='enrollment.student.user.get_full_name', read_only=True)
-    
-    class Meta:
-        model = Attendance
-        fields = ['id', 'enrollment', 'date', 'status', 'student_name']
-from university.models import Semester, Department, Classroom
-from users.models import Faculty, Student
 
 class CourseSerializer(serializers.ModelSerializer):
-    department = serializers.StringRelatedField()
+    """Flat course+schedule payload matching ManageCourses.jsx form."""
+
     class Meta:
         model = Course
-        fields = ['id', 'code', 'name', 'department', 'credits', 'description']
+        fields = [
+            'id', 'code', 'name', 'department', 'credits', 'semester',
+            'days', 'start_time', 'end_time', 'room', 'building', 'description',
+        ]
 
-class SemesterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Semester
-        fields = ['id', 'name', 'is_active']
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Format schedule string for table display: "Mon, Wed 10:00-11:30"
+        days_str = ', '.join(instance.days) if instance.days else ''
+        time_str = ''
+        if instance.start_time and instance.end_time:
+            time_str = f"{instance.start_time.strftime('%H:%M')}-{instance.end_time.strftime('%H:%M')}"
+        data['schedule'] = f"{days_str} {time_str}".strip() if days_str or time_str else ''
+        # Format location string: "Building - Room"
+        data['location'] = ''
+        if instance.building and instance.room:
+            data['location'] = f"{instance.building} - {instance.room}"
+        elif instance.building:
+            data['location'] = instance.building
+        elif instance.room:
+            data['location'] = instance.room
 
-class FacultySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='user.get_full_name', read_only=True)
-    class Meta:
-        model = Faculty
-        fields = ['id', 'faculty_id', 'name']
+        # Include students_count for faculty cards
+        data['students_count'] = instance.enrollments.filter(status='Active').count()
+        return data
 
-class ClassroomSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Classroom
-        fields = ['id', 'room_number', 'building']
 
-class ClassScheduleSerializer(serializers.ModelSerializer):
-    course = CourseSerializer(read_only=True)
-    semester = SemesterSerializer(read_only=True)
-    faculty = FacultySerializer(read_only=True)
-    classroom = ClassroomSerializer(read_only=True)
-
-    class Meta:
-        model = ClassSchedule
-        fields = ['id', 'course', 'semester', 'faculty', 'classroom', 'days_of_week', 'start_time', 'end_time']
-
-class EnrollmentSerializer(serializers.ModelSerializer):
-    schedule = ClassScheduleSerializer(read_only=True)
-    schedule_id = serializers.PrimaryKeyRelatedField(
-        queryset=ClassSchedule.objects.all(), source='schedule', write_only=True
-    )
-    status = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = Enrollment
-        fields = ['id', 'student', 'schedule', 'schedule_id', 'enrolled_at', 'status']
-        read_only_fields = ['student', 'enrolled_at']
+class FacultyCourseAssignmentSerializer(serializers.Serializer):
+    """Accepts { faculty_id, course_id } from AssignCourses.jsx."""
+    faculty_id = serializers.CharField()
+    course_id = serializers.IntegerField(required=False)
+    course_code = serializers.CharField(required=False)
 
     def validate(self, attrs):
-        schedule = attrs.get('schedule')
-        request = self.context.get('request')
-        student = request.user.student_profile
-        
-        # 1. Already Enrolled Check
-        if Enrollment.objects.filter(student=student, schedule=schedule).exists():
-            raise serializers.ValidationError("You are already enrolled in this course.")
+        # Resolve faculty
+        faculty_id = attrs.get('faculty_id')
+        try:
+            attrs['faculty_obj'] = Faculty.objects.get(faculty_id=faculty_id)
+        except Faculty.DoesNotExist:
+            raise serializers.ValidationError(f"Faculty with ID {faculty_id} not found.")
 
-        # 2. Check Prerequisites/Completion (Simplified: Check if passed before)
-        # Assuming Grade model exists and status='completed' means passed.
-        # This requires more complex query if Grade is separate. 
-        # For now, check if student has enrollment in same course with status='completed'
-        completed_enrollments = Enrollment.objects.filter(
-            student=student, 
-            schedule__course=schedule.course,
-            status='completed'
-        )
-        if completed_enrollments.exists():
-             raise serializers.ValidationError("You have already completed this course.")
+        # Resolve course (by id or code)
+        course_id = attrs.get('course_id')
+        course_code = attrs.get('course_code')
+        if course_id:
+            try:
+                attrs['course_obj'] = Course.objects.get(pk=course_id)
+            except Course.DoesNotExist:
+                raise serializers.ValidationError(f"Course with ID {course_id} not found.")
+        elif course_code:
+            try:
+                attrs['course_obj'] = Course.objects.get(code=course_code)
+            except Course.DoesNotExist:
+                raise serializers.ValidationError(f"Course with code {course_code} not found.")
+        else:
+            raise serializers.ValidationError("Either course_id or course_code is required.")
 
-        # 3. Time Conflict Check
-        # Check against active enrollments in the same semester
-        active_enrollments = Enrollment.objects.filter(
-            student=student,
-            schedule__semester=schedule.semester,
-            status='enrolled'
-        )
-        
-        # Re-use logic from ClassSchedule.clean() but check against enrolled schedules
-        my_days = set(schedule.days_of_week)
-        for enrollment in active_enrollments:
-            other_schedule = enrollment.schedule
-            other_days = set(other_schedule.days_of_week)
-            
-            if my_days.intersection(other_days):
-                if schedule.start_time < other_schedule.end_time and schedule.end_time > other_schedule.start_time:
-                     raise serializers.ValidationError(
-                         f"Time conflict with {other_schedule.course.code}: {other_schedule.days_of_week} {other_schedule.start_time}-{other_schedule.end_time}"
-                     )
+        # Duplicate check
+        if FacultyCourseAssignment.objects.filter(
+            faculty=attrs['faculty_obj'], course=attrs['course_obj']
+        ).exists():
+            raise serializers.ValidationError("This faculty is already assigned to this course.")
 
         return attrs
 
     def create(self, validated_data):
-        student = self.context['request'].user.student_profile
-        validated_data['student'] = student
-        return super().create(validated_data)
+        return FacultyCourseAssignment.objects.create(
+            faculty=validated_data['faculty_obj'],
+            course=validated_data['course_obj'],
+        )
+
+    def to_representation(self, instance):
+        return {
+            'id': instance.id,
+            'faculty_id': instance.faculty.faculty_id,
+            'faculty_name': instance.faculty.user.get_full_name(),
+            'course_code': instance.course.code,
+            'course_name': instance.course.name,
+        }
+
+
+class EnrollmentSerializer(serializers.Serializer):
+    """Accepts { student_id, course_code } from StudentEnrollment.jsx."""
+    student_id = serializers.CharField()
+    course_code = serializers.CharField()
+
+    def validate(self, attrs):
+        try:
+            attrs['student_obj'] = Student.objects.get(student_id=attrs['student_id'])
+        except Student.DoesNotExist:
+            raise serializers.ValidationError(f"Student {attrs['student_id']} not found.")
+
+        try:
+            attrs['course_obj'] = Course.objects.get(code=attrs['course_code'])
+        except Course.DoesNotExist:
+            raise serializers.ValidationError(f"Course {attrs['course_code']} not found.")
+
+        # Duplicate check
+        if Enrollment.objects.filter(
+            student=attrs['student_obj'], course=attrs['course_obj']
+        ).exists():
+            raise serializers.ValidationError("Student is already enrolled in this course.")
+
+        return attrs
+
+    def create(self, validated_data):
+        return Enrollment.objects.create(
+            student=validated_data['student_obj'],
+            course=validated_data['course_obj'],
+        )
+
+    def to_representation(self, instance):
+        # Resolve instructor from FacultyCourseAssignment
+        assignment = FacultyCourseAssignment.objects.filter(course=instance.course).first()
+        instructor = assignment.faculty.user.get_full_name() if assignment else 'Not Assigned'
+
+        return {
+            'id': instance.id,
+            'studentName': instance.student.user.get_full_name(),
+            'studentId': instance.student.student_id,
+            'courseCode': instance.course.code,
+            'courseName': instance.course.name,
+            'semester': instance.course.semester,
+            'instructor': instructor,
+            'status': instance.status,
+            'enrollment_date': instance.enrolled_at.strftime('%Y-%m-%d') if instance.enrolled_at else '',
+            # Extra fields for student enrollment view
+            'credits': instance.course.credits,
+            'schedule': self._format_schedule(instance.course),
+            'room': self._format_location(instance.course),
+        }
+
+    def _format_schedule(self, course):
+        days_str = ', '.join(course.days) if course.days else ''
+        time_str = ''
+        if course.start_time and course.end_time:
+            time_str = f"{course.start_time.strftime('%H:%M')}-{course.end_time.strftime('%H:%M')}"
+        return f"{days_str} {time_str}".strip()
+
+    def _format_location(self, course):
+        if course.room and course.building:
+            return f"{course.room} - {course.building}"
+        return course.room or course.building or ''
+
+
+class BulkGradeSerializer(serializers.Serializer):
+    """Accepts { course_code, grades: [{student_id, grade}] } from SubmitGrades.jsx."""
+    course_code = serializers.CharField()
+    grades = serializers.ListField(child=serializers.DictField())
+
+    def validate(self, attrs):
+        try:
+            attrs['course_obj'] = Course.objects.get(code=attrs['course_code'])
+        except Course.DoesNotExist:
+            raise serializers.ValidationError(f"Course {attrs['course_code']} not found.")
+
+        valid_grades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D', 'F']
+        for entry in attrs['grades']:
+            if 'student_id' not in entry or 'grade' not in entry:
+                raise serializers.ValidationError("Each grade entry must have student_id and grade.")
+            if entry['grade'] not in valid_grades:
+                raise serializers.ValidationError(f"Invalid grade: {entry['grade']}")
+            try:
+                Student.objects.get(student_id=entry['student_id'])
+            except Student.DoesNotExist:
+                raise serializers.ValidationError(f"Student {entry['student_id']} not found.")
+
+        return attrs
+
 
 class GradeSerializer(serializers.ModelSerializer):
-    enrollment_id = serializers.PrimaryKeyRelatedField(
-        queryset=Enrollment.objects.all(), source='enrollment', write_only=True
-    )
-    student_name = serializers.CharField(source='enrollment.student.user.get_full_name', read_only=True)
-    course_code = serializers.CharField(source='enrollment.schedule.course.code', read_only=True)
+    """For reading and updating individual grades."""
+    student_id = serializers.CharField(source='student.student_id', read_only=True)
+    student_name = serializers.CharField(source='student.user.get_full_name', read_only=True)
+    course_code = serializers.CharField(source='course.code', read_only=True)
+    course_name = serializers.CharField(source='course.name', read_only=True)
+    credits = serializers.IntegerField(source='course.credits', read_only=True)
+    semester = serializers.CharField(source='course.semester', read_only=True)
+    grade_points = serializers.DecimalField(source='gpa', max_digits=4, decimal_places=2, read_only=True)
 
     class Meta:
         model = Grade
-        fields = ['id', 'enrollment', 'enrollment_id', 'grade', 'gpa', 'score', 'comments', 'student_name', 'course_code']
-        read_only_fields = ['enrollment', 'gpa']
+        fields = [
+            'id', 'student_id', 'student_name', 'course_code', 'course_name',
+            'grade', 'grade_points', 'credits', 'semester',
+        ]
+        read_only_fields = ['id', 'student_id', 'student_name', 'course_code',
+                            'course_name', 'grade_points', 'credits', 'semester']

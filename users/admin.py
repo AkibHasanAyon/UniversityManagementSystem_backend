@@ -1,20 +1,21 @@
 from django.contrib import admin
-
 from django.contrib.auth.admin import UserAdmin
 from .models import User, Student, Faculty
 
-# Register your models here.
+
 class StudentInline(admin.StackedInline):
     model = Student
     can_delete = False
     verbose_name_plural = 'Student Profile'
     fk_name = 'user'
 
+
 class FacultyInline(admin.StackedInline):
     model = Faculty
     can_delete = False
     verbose_name_plural = 'Faculty Profile'
     fk_name = 'user'
+
 
 class CustomUserAdmin(UserAdmin):
     inlines = (StudentInline, FacultyInline)
@@ -26,9 +27,9 @@ class CustomUserAdmin(UserAdmin):
     def get_inline_instances(self, request, obj=None):
         if not obj:
             return list()
-        return super(CustomUserAdmin, self).get_inline_instances(request, obj)
+        return super().get_inline_instances(request, obj)
 
-# Register your models here.
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Student)
 admin.site.register(Faculty)
