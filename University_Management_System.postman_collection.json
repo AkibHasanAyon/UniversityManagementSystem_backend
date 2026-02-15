@@ -2,7 +2,7 @@
     "info": {
         "_postman_id": "8b5f3a0c-6e2b-4e3a-9c7d-0d6f3e1b7c2a",
         "name": "University Management System",
-        "description": "Comprehensive API collection for the University Management System backend.\n\nLogin first to auto-save JWT tokens, then use any endpoint.\n\nRoles: admin, faculty, student",
+        "description": "Comprehensive API collection for the University Management System.\n\n**Getting Started:**\n1. Run **Auth > Login** first. The tests script will automatically save `access_token` and `refresh_token` to your environment.\n2. Use these tokens for all other endpoints.\n\n**Roles:**\n- **Admin**: Full access to all endpoints\n- **Faculty**: Grading, Dashboard\n- **Student**: View grades, history, transcripts",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
@@ -18,7 +18,11 @@
                                 "exec": [
                                     "var jsonData = pm.response.json();",
                                     "pm.environment.set(\"access_token\", jsonData.access);",
-                                    "pm.environment.set(\"refresh_token\", jsonData.refresh);"
+                                    "pm.environment.set(\"refresh_token\", jsonData.refresh);",
+                                    "if(jsonData.user) {",
+                                    "    pm.environment.set(\"user_role\", jsonData.user.role);",
+                                    "    pm.environment.set(\"user_id\", jsonData.user.id);",
+                                    "}"
                                 ],
                                 "type": "text/javascript"
                             }
@@ -34,7 +38,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"username\": \"admin1\",\n    \"password\": \"password\"\n}",
+                            "raw": "{\n    \"email\": \"admin1@university.edu\",\n    \"password\": \"password\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -42,7 +46,7 @@
                             }
                         },
                         "url": "{{base_url}}/api/auth/login/",
-                        "description": "Authenticate and get JWT tokens. Response includes access, refresh, and user info (role, name, email, id)."
+                        "description": "Authenticate using email and password. Returns JWT tokens and user info.\n\n**Required:** `email`, `password`"
                     }
                 },
                 {
@@ -77,7 +81,7 @@
                             }
                         },
                         "url": "{{base_url}}/api/auth/refresh/",
-                        "description": "Get a new access token using the refresh token."
+                        "description": "Get a new access token using a valid refresh token."
                     }
                 },
                 {
@@ -104,7 +108,7 @@
                             }
                         },
                         "url": "{{base_url}}/api/auth/logout/",
-                        "description": "Blacklist the refresh token. Returns 204 No Content."
+                        "description": "Blacklist the refresh token to prevent further access token generation."
                     }
                 },
                 {
@@ -119,7 +123,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"email\": \"admin@university.edu\"\n}",
+                            "raw": "{\n    \"email\": \"student@university.edu\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -127,7 +131,7 @@
                             }
                         },
                         "url": "{{base_url}}/api/auth/forgot-password/",
-                        "description": "Request a password reset link. Sends an email with a reset URL."
+                        "description": "Trigger a password reset email."
                     }
                 },
                 {
@@ -150,13 +154,13 @@
                             }
                         },
                         "url": "{{base_url}}/api/auth/reset-password/",
-                        "description": "Confirm password reset using uid and token from the email link."
+                        "description": "Complete the password reset process using the token from the email."
                     }
                 }
             ]
         },
         {
-            "name": "Users — Students",
+            "name": "Users (Admin Only)",
             "item": [
                 {
                     "name": "List Students",
@@ -195,7 +199,7 @@
                                 }
                             ]
                         },
-                        "description": "Admin only. Paginated list of students with optional search."
+                        "description": "Get a paginated list of students."
                     }
                 },
                 {
@@ -214,7 +218,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"student_id\": \"STU001\",\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@university.edu\",\n    \"password\": \"password123\",\n    \"major\": \"Computer Science\",\n    \"year\": \"1st\",\n    \"gpa\": 3.50\n}",
+                            "raw": "{\n    \"student_id\": \"STU2024001\",\n    \"name\": \"Alice Wonderland\",\n    \"email\": \"alice@university.edu\",\n    \"password\": \"password123\",\n    \"major\": \"Computer Science\",\n    \"year\": \"1st\",\n    \"gpa\": 3.80\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -222,7 +226,7 @@
                             }
                         },
                         "url": "{{base_url}}/api/users/students/",
-                        "description": "Admin only. Create a new student. Year choices: 1st, 2nd, 3rd, 4th."
+                        "description": "Create a new student account.\n\n**Required:**\n- `student_id` (unique)\n- `name` (Full Name)\n- `email` (unique)\n- `major`\n- `year` ('1st', '2nd', '3rd', '4th')\n- `gpa` (decimal)"
                     }
                 },
                 {
@@ -235,8 +239,8 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "{{base_url}}/api/users/students/STU001/",
-                        "description": "Admin only. Retrieve a single student by student_id."
+                        "url": "{{base_url}}/api/users/students/STU2024001/",
+                        "description": "Retrieve student details by student_id."
                     }
                 },
                 {
@@ -255,15 +259,15 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"student_id\": \"STU001\",\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@university.edu\",\n    \"major\": \"Computer Science\",\n    \"year\": \"2nd\",\n    \"gpa\": 3.75\n}",
+                            "raw": "{\n    \"name\": \"Alice W. Land\",\n    \"email\": \"alice.w@university.edu\",\n    \"major\": \"Data Science\",\n    \"year\": \"2nd\",\n    \"gpa\": 3.90\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
                                 }
                             }
                         },
-                        "url": "{{base_url}}/api/users/students/STU001/",
-                        "description": "Admin only. Update student info. Password is optional on update."
+                        "url": "{{base_url}}/api/users/students/STU2024001/",
+                        "description": "Update student information. Fields not provided will remain unchanged."
                     }
                 },
                 {
@@ -276,15 +280,10 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "{{base_url}}/api/users/students/STU001/",
-                        "description": "Admin only. Deletes the student and their associated user account."
+                        "url": "{{base_url}}/api/users/students/STU2024001/",
+                        "description": "Permanently delete a student and their user account."
                     }
-                }
-            ]
-        },
-        {
-            "name": "Users — Faculty",
-            "item": [
+                },
                 {
                     "name": "List Faculty",
                     "request": {
@@ -310,7 +309,7 @@
                                 {
                                     "key": "search",
                                     "value": "",
-                                    "description": "Search by name, email, department, or faculty_id"
+                                    "description": "Search by name, email, department"
                                 },
                                 {
                                     "key": "page",
@@ -322,7 +321,7 @@
                                 }
                             ]
                         },
-                        "description": "Admin only. Paginated list of faculty with optional search."
+                        "description": "Get a paginated list of faculty members."
                     }
                 },
                 {
@@ -341,7 +340,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"faculty_id\": \"FAC001\",\n    \"name\": \"Dr. Jane Smith\",\n    \"email\": \"jane.smith@university.edu\",\n    \"password\": \"password123\",\n    \"department\": \"Computer Science\",\n    \"specialization\": \"Artificial Intelligence\",\n    \"join_date\": \"2024-01-15\"\n}",
+                            "raw": "{\n    \"faculty_id\": \"FAC2024001\",\n    \"name\": \"Dr. John Smith\",\n    \"email\": \"john.smith@university.edu\",\n    \"password\": \"password123\",\n    \"department\": \"Computer Science\",\n    \"specialization\": \"AI & Machine Learning\",\n    \"join_date\": \"2024-01-15\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -349,7 +348,7 @@
                             }
                         },
                         "url": "{{base_url}}/api/users/faculty/",
-                        "description": "Admin only. Create a new faculty member."
+                        "description": "Create a new faculty account.\n\n**Required:**\n- `faculty_id`\n- `name`\n- `email`\n- `department`\n- `specialization`\n- `join_date` (YYYY-MM-DD)"
                     }
                 },
                 {
@@ -362,8 +361,8 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "{{base_url}}/api/users/faculty/FAC001/",
-                        "description": "Admin only. Retrieve a single faculty member by faculty_id."
+                        "url": "{{base_url}}/api/users/faculty/FAC2024001/",
+                        "description": "Retrieve faculty details by faculty_id."
                     }
                 },
                 {
@@ -382,15 +381,15 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"faculty_id\": \"FAC001\",\n    \"name\": \"Dr. Jane Smith\",\n    \"email\": \"jane.smith@university.edu\",\n    \"department\": \"Computer Science\",\n    \"specialization\": \"Machine Learning\",\n    \"join_date\": \"2024-01-15\"\n}",
+                            "raw": "{\n  \"faculty_id\": \"FAC2024001\",\n    \"name\": \"Dr. John Smith\",\n    \"email\": \"john.smith@university.edu\",\n    \"department\": \"Computer Science\",\n    \"specialization\": \"AI & Machine Learning\",\n    \"join_date\": \"2024-01-15\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
                                 }
                             }
                         },
-                        "url": "{{base_url}}/api/users/faculty/FAC001/",
-                        "description": "Admin only. Update faculty info. Password is optional on update."
+                        "url": "{{base_url}}/api/users/faculty/FAC2024001/",
+                        "description": "Update faculty details."
                     }
                 },
                 {
@@ -403,14 +402,14 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": "{{base_url}}/api/users/faculty/FAC001/",
-                        "description": "Admin only. Deletes the faculty member and their associated user account."
+                        "url": "{{base_url}}/api/users/faculty/FAC2024001/",
+                        "description": "Permanently delete a faculty member."
                     }
                 }
             ]
         },
         {
-            "name": "Courses",
+            "name": "Academic Management",
             "item": [
                 {
                     "name": "List Courses",
@@ -423,7 +422,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/academic/courses/?search=&page=1&page_size=5&faculty=",
+                            "raw": "{{base_url}}/api/academic/courses/?search=&faculty=",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -437,24 +436,16 @@
                                 {
                                     "key": "search",
                                     "value": "",
-                                    "description": "Search by name, code, or department"
-                                },
-                                {
-                                    "key": "page",
-                                    "value": "1"
-                                },
-                                {
-                                    "key": "page_size",
-                                    "value": "5"
+                                    "description": "Search by code or name"
                                 },
                                 {
                                     "key": "faculty",
                                     "value": "",
-                                    "description": "Set to 'current' to filter to assigned courses (faculty role)"
+                                    "description": "Set to 'current' to see only assigned courses"
                                 }
                             ]
                         },
-                        "description": "Authenticated. Paginated list of courses with search and faculty filter."
+                        "description": "List all courses. Faculty user `faculty=current` to see their assigned courses."
                     }
                 },
                 {
@@ -473,7 +464,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"code\": \"CS101\",\n    \"name\": \"Intro to Computer Science\",\n    \"department\": \"Computer Science\",\n    \"credits\": 3,\n    \"semester\": \"Spring 2026\",\n    \"days\": [\"Mon\", \"Wed\", \"Fri\"],\n    \"start_time\": \"09:00\",\n    \"end_time\": \"10:30\",\n    \"room\": \"101\",\n    \"building\": \"Science Hall\",\n    \"description\": \"Fundamentals of computing\"\n}",
+                            "raw": "{\n    \"code\": \"CSE101\",\n    \"name\": \"Introduction to Programming\",\n    \"department\": \"Computer Science\",\n    \"credits\": 3,\n    \"semester\": \"Spring 2026\",\n    \"days\": [\"Mon\", \"Wed\"],\n    \"start_time\": \"09:00\",\n    \"end_time\": \"10:30\",\n    \"room\": \"Room 101\",\n    \"building\": \"Tech Block A\",\n    \"description\": \"Basic programming concepts using Python.\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -481,21 +472,7 @@
                             }
                         },
                         "url": "{{base_url}}/api/academic/courses/",
-                        "description": "Admin only. Create a new course with schedule details."
-                    }
-                },
-                {
-                    "name": "Get Course",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/academic/courses/1/",
-                        "description": "Authenticated. Retrieve a single course by ID."
+                        "description": "Create a new course.\n\n**Required:**\n- `code` (unique)\n- `name`\n- `department`\n- `credits` (1-6)\n\n**Optional:**\n- `days` (Array of strings e.g. [\"Mon\", \"Wed\"])\n- `start_time` / `end_time` (HH:MM)\n- `room`, `building`"
                     }
                 },
                 {
@@ -514,7 +491,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"code\": \"CS101\",\n    \"name\": \"Intro to Computer Science\",\n    \"department\": \"Computer Science\",\n    \"credits\": 3,\n    \"semester\": \"Spring 2026\",\n    \"days\": [\"Mon\", \"Wed\"],\n    \"start_time\": \"10:00\",\n    \"end_time\": \"11:30\",\n    \"room\": \"202\",\n    \"building\": \"Tech Building\",\n    \"description\": \"Updated course description\"\n}",
+                            "raw": "{\n    \"name\": \"Advanced Programming\",\n    \"credits\": 4,\n    \"room\": \"Lab 2\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -522,7 +499,7 @@
                             }
                         },
                         "url": "{{base_url}}/api/academic/courses/1/",
-                        "description": "Admin only. Update a course by ID."
+                        "description": "Update course details by ID."
                     }
                 },
                 {
@@ -536,30 +513,11 @@
                             }
                         ],
                         "url": "{{base_url}}/api/academic/courses/1/",
-                        "description": "Admin only. Delete a course by ID."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Faculty-Course Assignments",
-            "item": [
-                {
-                    "name": "List Assignments",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/academic/assignments/",
-                        "description": "Admin only. List all faculty-course assignments."
+                        "description": "Delete a course by ID."
                     }
                 },
                 {
-                    "name": "Create Assignment",
+                    "name": "Assign Faculty to Course",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -574,7 +532,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"faculty_id\": \"FAC001\",\n    \"course_code\": \"CS101\"\n}",
+                            "raw": "{\n    \"faculty_id\": \"FAC2024001\",\n    \"course_code\": \"CSE101\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -582,14 +540,36 @@
                             }
                         },
                         "url": "{{base_url}}/api/academic/assignments/",
-                        "description": "Admin only. Assign a faculty member to a course. Use either course_code or course_id."
+                        "description": "Assign a faculty member to a course.\n\n**Required:**\n- `faculty_id`\n- `course_code` (or `course_id`)"
                     }
-                }
-            ]
-        },
-        {
-            "name": "Enrollments",
-            "item": [
+                },
+                {
+                    "name": "Enroll Student",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"student_id\": \"STU2024001\",\n    \"course_code\": \"CSE101\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": "{{base_url}}/api/academic/enrollments/",
+                        "description": "Enroll a student in a course.\n\n**Required:**\n- `student_id`\n- `course_code`"
+                    }
+                },
                 {
                     "name": "List Enrollments",
                     "request": {
@@ -601,7 +581,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/academic/enrollments/?search=&student=&faculty=&course=&semester=",
+                            "raw": "{{base_url}}/api/academic/enrollments/?search=&student=&course=",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -615,78 +595,27 @@
                                 {
                                     "key": "search",
                                     "value": "",
-                                    "description": "Search by student name, student_id, or course code"
+                                    "description": "Search by student/course"
                                 },
                                 {
                                     "key": "student",
                                     "value": "",
-                                    "description": "Set to 'current' for student's own enrollments"
-                                },
-                                {
-                                    "key": "faculty",
-                                    "value": "",
-                                    "description": "Set to 'current' for faculty's assigned course enrollments"
+                                    "description": "Set to 'current' for student specific"
                                 },
                                 {
                                     "key": "course",
                                     "value": "",
                                     "description": "Filter by course code"
-                                },
-                                {
-                                    "key": "semester",
-                                    "value": "",
-                                    "description": "Filter by semester"
                                 }
                             ]
                         },
-                        "description": "Authenticated. List enrollments with filters. Students see only their own."
-                    }
-                },
-                {
-                    "name": "Create Enrollment",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"student_id\": \"STU001\",\n    \"course_code\": \"CS101\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/academic/enrollments/",
-                        "description": "Admin only. Enroll a student in a course."
-                    }
-                },
-                {
-                    "name": "Delete Enrollment",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/academic/enrollments/1/",
-                        "description": "Admin only. Remove an enrollment by ID."
+                        "description": "View enrollments. Supports filtering."
                     }
                 }
             ]
         },
         {
-            "name": "Grading",
+            "name": "Grading & Records",
             "item": [
                 {
                     "name": "List Grades",
@@ -699,7 +628,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/academic/grades/?faculty=current&student=&search=",
+                            "raw": "{{base_url}}/api/academic/grades/?faculty=current",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -713,21 +642,11 @@
                                 {
                                     "key": "faculty",
                                     "value": "current",
-                                    "description": "Set to 'current' for faculty's submitted grades"
-                                },
-                                {
-                                    "key": "student",
-                                    "value": "",
-                                    "description": "Set to 'current' for student's own grades"
-                                },
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Search by student name, student_id, or course code"
+                                    "description": "Show grades submitted by me"
                                 }
                             ]
                         },
-                        "description": "Authenticated. Faculty sees grades they submitted, students see their own."
+                        "description": "View submitted grades."
                     }
                 },
                 {
@@ -746,7 +665,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"course_code\": \"CS101\",\n    \"grades\": [\n        { \"student_id\": \"STU001\", \"grade\": \"A\" },\n        { \"student_id\": \"STU002\", \"grade\": \"B+\" }\n    ]\n}",
+                            "raw": "{\n    \"course_code\": \"CSE101\",\n    \"grades\": [\n        { \"student_id\": \"STU2024001\", \"grade\": \"A\" }\n    ]\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -754,7 +673,7 @@
                             }
                         },
                         "url": "{{base_url}}/api/academic/grades/bulk/",
-                        "description": "Faculty only. Bulk submit/update grades for a course. Valid grades: A, A-, B+, B, B-, C+, C, C-, D, F."
+                        "description": "Faculty can submit multiple grades at once.\n\n**Valid Grades**: A, A-, B+, B, B-, C+, C, C-, D, F"
                     }
                 },
                 {
@@ -781,16 +700,30 @@
                             }
                         },
                         "url": "{{base_url}}/api/academic/grades/1/",
-                        "description": "Faculty only. Update a single grade by ID."
+                        "description": "Update a specific grade entry by ID."
+                    }
+                },
+                {
+                    "name": "Academic Records (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": "{{base_url}}/api/academic/records/",
+                        "description": "Admin view of all academic records across the university."
                     }
                 }
             ]
         },
         {
-            "name": "Academic Records",
+            "name": "Student View",
             "item": [
                 {
-                    "name": "List Academic Records",
+                    "name": "My Schedule",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -800,57 +733,7 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/academic/records/?search=&semester=&page=1&page_size=8",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "academic",
-                                "records",
-                                ""
-                            ],
-                            "query": [
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Search by student name, student_id, or course code"
-                                },
-                                {
-                                    "key": "semester",
-                                    "value": "",
-                                    "description": "Filter by semester"
-                                },
-                                {
-                                    "key": "page",
-                                    "value": "1"
-                                },
-                                {
-                                    "key": "page_size",
-                                    "value": "8"
-                                }
-                            ]
-                        },
-                        "description": "Admin only. Paginated view of all grade records."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Schedule",
-            "item": [
-                {
-                    "name": "Today's Schedule",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/academic/schedules/today/?role=faculty",
+                            "raw": "{{base_url}}/api/academic/schedules/today/?role=student",
                             "host": [
                                 "{{base_url}}"
                             ],
@@ -864,52 +747,15 @@
                             "query": [
                                 {
                                     "key": "role",
-                                    "value": "faculty",
-                                    "description": "faculty or student"
+                                    "value": "student"
                                 }
                             ]
                         },
-                        "description": "Authenticated. Returns today's and tomorrow's class schedules based on the logged-in user's role."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Academic History (Student)",
-            "item": [
-                {
-                    "name": "Get Academic History",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/academic/history/?student=current",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "academic",
-                                "history",
-                                ""
-                            ],
-                            "query": [
-                                {
-                                    "key": "student",
-                                    "value": "current"
-                                }
-                            ]
-                        },
-                        "description": "Student only. Semester-by-semester grade breakdown with per-semester GPA."
+                        "description": "Get class schedule for today and tomorrow."
                     }
                 },
                 {
-                    "name": "Get Academic Summary",
+                    "name": "Academic History",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -918,35 +764,12 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": {
-                            "raw": "{{base_url}}/api/academic/history/summary/?student=current",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "academic",
-                                "history",
-                                "summary",
-                                ""
-                            ],
-                            "query": [
-                                {
-                                    "key": "student",
-                                    "value": "current"
-                                }
-                            ]
-                        },
-                        "description": "Student only. Cumulative GPA, total credits, semesters count, and courses completed."
+                        "url": "{{base_url}}/api/academic/history/",
+                        "description": "Get detailed semester-by-semester grade history."
                     }
-                }
-            ]
-        },
-        {
-            "name": "Transcript (Student)",
-            "item": [
+                },
                 {
-                    "name": "Download Transcript PDF",
+                    "name": "Academic Summary",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -955,38 +778,31 @@
                                 "value": "Bearer {{access_token}}"
                             }
                         ],
-                        "url": {
-                            "raw": "{{base_url}}/api/academic/transcript/?student=current&format=pdf",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "academic",
-                                "transcript",
-                                ""
-                            ],
-                            "query": [
-                                {
-                                    "key": "student",
-                                    "value": "current"
-                                },
-                                {
-                                    "key": "format",
-                                    "value": "pdf"
-                                }
-                            ]
-                        },
-                        "description": "Student only. Downloads an official transcript as a PDF file."
+                        "url": "{{base_url}}/api/academic/history/summary/",
+                        "description": "Get cumulative GPA and total credits."
+                    }
+                },
+                {
+                    "name": "Download Transcript",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": "{{base_url}}/api/academic/transcript/",
+                        "description": "Download official transcript PDF."
                     }
                 }
             ]
         },
         {
-            "name": "Dashboard Stats",
+            "name": "Dashboard",
             "item": [
                 {
-                    "name": "Admin Dashboard Stats",
+                    "name": "Admin Stats",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -996,11 +812,11 @@
                             }
                         ],
                         "url": "{{base_url}}/api/dashboard/admin/stats/",
-                        "description": "Admin only. Returns total_students, total_faculty, total_courses."
+                        "description": "Admin dashboard statistics."
                     }
                 },
                 {
-                    "name": "Faculty Dashboard Stats",
+                    "name": "Faculty Stats",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -1010,11 +826,11 @@
                             }
                         ],
                         "url": "{{base_url}}/api/dashboard/faculty/stats/",
-                        "description": "Faculty only. Returns assigned_courses_count, total_students_count."
+                        "description": "Faculty dashboard statistics."
                     }
                 },
                 {
-                    "name": "Student Dashboard Stats",
+                    "name": "Student Stats",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -1024,39 +840,7 @@
                             }
                         ],
                         "url": "{{base_url}}/api/dashboard/student/stats/",
-                        "description": "Student only. Returns enrolled_courses_count, current_gpa."
-                    }
-                }
-            ]
-        },
-        {
-            "name": "API Docs",
-            "item": [
-                {
-                    "name": "OpenAPI Schema",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": "{{base_url}}/api/schema/",
-                        "description": "Download the OpenAPI 3.0 schema (YAML)."
-                    }
-                },
-                {
-                    "name": "Swagger UI",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": "{{base_url}}/api/docs/",
-                        "description": "Interactive Swagger API documentation."
-                    }
-                },
-                {
-                    "name": "ReDoc",
-                    "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": "{{base_url}}/api/redoc/",
-                        "description": "ReDoc API documentation."
+                        "description": "Student dashboard statistics."
                     }
                 }
             ]
@@ -1065,7 +849,7 @@
     "variable": [
         {
             "key": "base_url",
-            "value": "http://127.0.0.1:8000",
+            "value": "https://vondobaba.pythonanywhere.com",
             "type": "string"
         },
         {
@@ -1075,6 +859,16 @@
         },
         {
             "key": "refresh_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "user_role",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "user_id",
             "value": "",
             "type": "string"
         }
