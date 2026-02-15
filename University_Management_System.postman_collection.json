@@ -259,7 +259,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Alice W. Land\",\n    \"email\": \"alice.w@university.edu\",\n    \"major\": \"Data Science\",\n    \"year\": \"2nd\",\n    \"gpa\": 3.90\n}",
+                            "raw": "{\n    \"student_id\": \"STU2024001\",\n    \"name\": \"Alice W. Land\",\n    \"email\": \"alice.w@university.edu\",\n    \"password\": \"newpassword123\",\n    \"major\": \"Data Science\",\n    \"year\": \"2nd\",\n    \"gpa\": 3.90\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -381,7 +381,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"faculty_id\": \"FAC2024001\",\n    \"name\": \"Dr. John Smith\",\n    \"email\": \"john.smith@university.edu\",\n    \"department\": \"Computer Science\",\n    \"specialization\": \"AI & Machine Learning\",\n    \"join_date\": \"2024-01-15\"\n}",
+                            "raw": "{\n    \"faculty_id\": \"FAC2024001\",\n    \"name\": \"Dr. John Smith\",\n    \"email\": \"john.smith@university.edu\",\n    \"password\": \"newpassword123\",\n    \"department\": \"Computer Science\",\n    \"specialization\": \"AI & Machine Learning\",\n    \"join_date\": \"2024-01-15\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -491,7 +491,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"Advanced Programming\",\n    \"credits\": 4,\n    \"room\": \"Lab 2\"\n}",
+                            "raw": "{\n    \"code\": \"CSE101\",\n    \"name\": \"Advanced Programming\",\n    \"department\": \"Computer Science\",\n    \"credits\": 4,\n    \"semester\": \"Spring 2026\",\n    \"days\": [\"Mon\", \"Wed\", \"Fri\"],\n    \"start_time\": \"09:00\",\n    \"end_time\": \"10:30\",\n    \"room\": \"Lab 2\",\n    \"building\": \"Tech Block B\",\n    \"description\": \"Advanced concepts including concurrency and design patterns.\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
