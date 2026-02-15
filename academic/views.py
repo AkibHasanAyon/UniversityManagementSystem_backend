@@ -51,6 +51,7 @@ class CourseListCreateView(generics.ListCreateAPIView):
         return [IsAuthenticated()]
 
     def get_queryset(self):
+        # Shob course gulo niye asha hocche.
         queryset = Course.objects.all()
         search = self.request.query_params.get('search', '').strip()
         faculty_param = self.request.query_params.get('faculty', '').strip()
@@ -63,6 +64,7 @@ class CourseListCreateView(generics.ListCreateAPIView):
             )
 
         # Faculty: only show their assigned courses
+        # Faculty jodi login kora thake, tahole shudhu tar course gulo dekhano hobe.
         if faculty_param == 'current' and hasattr(self.request.user, 'faculty_profile'):
             assigned_course_ids = FacultyCourseAssignment.objects.filter(
                 faculty=self.request.user.faculty_profile
@@ -132,6 +134,7 @@ class EnrollmentListCreateView(generics.ListCreateAPIView):
         ).all()
 
         user = self.request.user
+        # Filters apply kora hocche search query er opor base kore.
         search = self.request.query_params.get('search', '').strip()
         student_param = self.request.query_params.get('student', '').strip()
         faculty_param = self.request.query_params.get('faculty', '').strip()
@@ -242,6 +245,7 @@ class BulkGradeCreateView(APIView):
         faculty = request.user.faculty_profile
 
         # Verify faculty is assigned to this course
+        # Check kora hocche je faculty ei course er teacher kina.
         if not FacultyCourseAssignment.objects.filter(faculty=faculty, course=course).exists():
             return Response(
                 {'error': 'You are not assigned to this course.'},
@@ -368,6 +372,7 @@ class ScheduleTodayView(APIView):
             for c in courses_qs:
                 if target_day in (c.days or []):
                     # Get instructor
+                    # Course er instructor ke sheta ber kora hocche.
                     assignment = FacultyCourseAssignment.objects.filter(course=c).first()
                     instructor = assignment.faculty.user.get_full_name() if assignment else ''
 

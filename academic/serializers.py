@@ -31,6 +31,7 @@ class CourseSerializer(serializers.ModelSerializer):
             data['location'] = instance.room
 
         # Include students_count for faculty cards
+        # Ei course e kotojon student enroll kora ache ta count kora hocche.
         data['students_count'] = instance.enrollments.filter(status='Active').count()
         return data
 
@@ -66,6 +67,7 @@ class FacultyCourseAssignmentSerializer(serializers.Serializer):
             raise serializers.ValidationError("Either course_id or course_code is required.")
 
         # Duplicate check
+        # Faculty age thekei ei course e assign kora ache kina check kora hocche.
         if FacultyCourseAssignment.objects.filter(
             faculty=attrs['faculty_obj'], course=attrs['course_obj']
         ).exists():
@@ -106,6 +108,7 @@ class EnrollmentSerializer(serializers.Serializer):
             raise serializers.ValidationError(f"Course {attrs['course_code']} not found.")
 
         # Duplicate check
+        # Student age thekei ei course e enroll kora ache kina check kora hocche.
         if Enrollment.objects.filter(
             student=attrs['student_obj'], course=attrs['course_obj']
         ).exists():

@@ -13,6 +13,7 @@ User = get_user_model()
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """Returns JWT tokens + user info matching frontend LoginPage expectations."""
+    # Login er somy user er details ew pass kora hocche.
 
     def validate(self, attrs):
         data = super().validate(attrs)
@@ -25,7 +26,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'email': user.email,
         }
 
-        # Attach the role-specific ID
+        # User er role check kore specific ID add kora hocche.
         if user.role == 'student' and hasattr(user, 'student_profile'):
             user_data['id'] = user.student_profile.student_id
         elif user.role == 'faculty' and hasattr(user, 'faculty_profile'):

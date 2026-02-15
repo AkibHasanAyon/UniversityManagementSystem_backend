@@ -6,8 +6,10 @@ from django.dispatch import receiver
 
 class Course(models.Model):
     """Combined Course + Schedule model matching frontend ManageCourses form."""
+    # Course er details store kora hocche.
     code = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=200)
+    # Kon department er course sheta indicate kore.
     department = models.CharField(max_length=100)
     credits = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(6)])
     semester = models.CharField(max_length=50, blank=True)  # e.g. "Fall 2025"
@@ -45,9 +47,11 @@ class Enrollment(models.Model):
         ('Dropped', 'Dropped'),
         ('Completed', 'Completed'),
     )
+    # Student kon course e enroll ache sheta track kora hocche.
     student = models.ForeignKey('users.Student', on_delete=models.CASCADE, related_name='enrollments')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrollments')
     enrolled_at = models.DateTimeField(auto_now_add=True)
+    # Enrollment er status (Active, Dropped, Completed) manage kora hocche.
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Active')
 
     class Meta:
@@ -81,6 +85,7 @@ class Grade(models.Model):
         unique_together = ('student', 'course')
 
     def save(self, *args, **kwargs):
+        # Grade save korar somoy GPA automatically calculate kora hocche.
         self.gpa = self.GPA_MAP.get(self.grade, 0.0)
         super().save(*args, **kwargs)
 
@@ -91,6 +96,7 @@ class Grade(models.Model):
 @receiver(post_save, sender=Grade)
 def update_student_gpa(sender, instance, **kwargs):
     """Recalculate student's cumulative GPA whenever a grade is saved."""
+    # Jokhon e kono notun grade add hobe, student er total GPA update hobe.
     student = instance.student
     grades = Grade.objects.filter(student=student).select_related('course')
 

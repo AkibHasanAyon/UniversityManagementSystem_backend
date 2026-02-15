@@ -15,6 +15,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
     def __str__(self):
+        # Email ke string representation hisebe return korchi.
         return self.email
 
 
@@ -31,7 +32,9 @@ class Student(models.Model):
     year = models.CharField(max_length=10, choices=YEAR_CHOICES, default='1st')
     current_gpa = models.DecimalField(max_digits=4, decimal_places=2, default=0.00)
 
+    # Student er role define kora hocche.
     def __str__(self):
+        # Student ID ebong full name return korbe.
         return f"{self.student_id} - {self.user.get_full_name()}"
 
 
@@ -42,5 +45,7 @@ class Faculty(models.Model):
     specialization = models.CharField(max_length=200, blank=True)
     join_date = models.DateField()
 
+    # Faculty er details store korar jonno ei model.
     def __str__(self):
+        # Faculty ID ebong full name return korbe.
         return f"{self.faculty_id} - {self.user.get_full_name()}"
