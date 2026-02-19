@@ -3,11 +3,11 @@
 ## Seed Credentials
 The database has been seeded with the following users:
 
-| **Role** | **Email**               | **Password   | **ID**   |
-|----------|-------------------------|--------------|----------|
-| Admin    | `admin@university.edu`  | `admin123`   |    -     |
-| Faculty  | `rahman@university.edu` | `faculty123` | `FAC001` |
-| Student  | `ayesha@university.edu` | `student123` | `STU001` |
+| **Role** | **Email**               | **Password**   | **ID**   |
+|----------|-------------------------|----------------|----------|
+| Admin    | `admin@university.edu`  | `admin123`     |    -     |
+| Faculty  | `rahman@university.edu` | `faculty123`   | `FAC001` |
+| Student  | `ayesha@university.edu` | `student123`   | `STU001` |
 
 
 
