@@ -11,7 +11,7 @@ The database has been seeded with the following users:
 
 
 
-### Start Server:
+### Start Server Locally:
 ```bash
 source .venv/bin/activate
 python manage.py runserver
@@ -27,4 +27,15 @@ python test_all_endpoints.py
 rm db.sqlite3
 python manage.py migrate
 python seed_data.py
+```
+
+### Update and deploy on PythonAnywhere
+```bash
+cd UniversityManagementSystem_backend
+source venv/bin/activate
+git pull origin main
+python manage.py migrate
+python manage.py collectstatic
+
+click reload from https://www.pythonanywhere.com/user/vondobaba/webapps/#tab_id_vondobaba_pythonanywhere_com
 ```
