@@ -9,7 +9,7 @@ The database has been seeded with the following users:
 | Faculty  | `rahman@university.edu` | `faculty123` | `FAC001` |
 | Student  | `ayesha@university.edu` | `student123` | `STU001` |
 
-## How to Run
+
 
 ### Start Server:
 ```bash

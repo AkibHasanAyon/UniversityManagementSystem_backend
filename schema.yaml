@@ -1,0 +1,2029 @@
+openapi: 3.0.3
+info:
+  title: University Management System API
+  version: 1.0.0
+  description: 'API documentation for the University Management System. Note: All
+    responses are wrapped in a standard envelope: `{ "status": "...", "message": "...",
+    "data": ... }`.'
+paths:
+  /api/academic/assignments/:
+    get:
+      operationId: academic_assignments_list
+      description: |-
+        GET  /api/academic/assignments/
+        POST /api/academic/assignments/
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FacultyCourseAssignment'
+                required:
+                - status
+                - message
+          description: ''
+    post:
+      operationId: academic_assignments_create
+      description: |-
+        GET  /api/academic/assignments/
+        POST /api/academic/assignments/
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacultyCourseAssignmentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FacultyCourseAssignmentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FacultyCourseAssignmentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/FacultyCourseAssignment'
+                required:
+                - status
+                - message
+          description: ''
+  /api/academic/courses/:
+    get:
+      operationId: academic_courses_list
+      description: |-
+        GET  /api/academic/courses/?search=&page=&page_size=5&faculty=current
+        POST /api/academic/courses/
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/PaginatedCourseList'
+                required:
+                - status
+                - message
+          description: ''
+    post:
+      operationId: academic_courses_create
+      description: |-
+        GET  /api/academic/courses/?search=&page=&page_size=5&faculty=current
+        POST /api/academic/courses/
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Course'
+                required:
+                - status
+                - message
+          description: ''
+  /api/academic/courses/{id}/:
+    get:
+      operationId: academic_courses_retrieve
+      description: |-
+        GET    /api/academic/courses/{id}/
+        PUT    /api/academic/courses/{id}/
+        DELETE /api/academic/courses/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Course'
+                required:
+                - status
+                - message
+          description: ''
+    put:
+      operationId: academic_courses_update
+      description: |-
+        GET    /api/academic/courses/{id}/
+        PUT    /api/academic/courses/{id}/
+        DELETE /api/academic/courses/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Course'
+                required:
+                - status
+                - message
+          description: ''
+    patch:
+      operationId: academic_courses_partial_update
+      description: |-
+        GET    /api/academic/courses/{id}/
+        PUT    /api/academic/courses/{id}/
+        DELETE /api/academic/courses/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Course'
+                required:
+                - status
+                - message
+          description: ''
+    delete:
+      operationId: academic_courses_destroy
+      description: |-
+        GET    /api/academic/courses/{id}/
+        PUT    /api/academic/courses/{id}/
+        DELETE /api/academic/courses/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/academic/enrollments/:
+    get:
+      operationId: academic_enrollments_list
+      description: |-
+        GET  /api/academic/enrollments/?search=&student=current&faculty=current&course=
+        POST /api/academic/enrollments/
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Enrollment'
+                required:
+                - status
+                - message
+          description: ''
+    post:
+      operationId: academic_enrollments_create
+      description: |-
+        GET  /api/academic/enrollments/?search=&student=current&faculty=current&course=
+        POST /api/academic/enrollments/
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Enrollment'
+                required:
+                - status
+                - message
+          description: ''
+  /api/academic/enrollments/{id}/:
+    delete:
+      operationId: academic_enrollments_destroy
+      description: DELETE /api/academic/enrollments/{id}/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/academic/grades/:
+    get:
+      operationId: academic_grades_list
+      description: GET /api/academic/grades/?faculty=current&student=current&search=
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Grade'
+                required:
+                - status
+                - message
+          description: ''
+  /api/academic/grades/{id}/:
+    put:
+      operationId: academic_grades_update
+      description: PUT /api/academic/grades/{id}/ — Faculty updates a single grade.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GradeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GradeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Grade'
+                required:
+                - status
+                - message
+          description: ''
+    patch:
+      operationId: academic_grades_partial_update
+      description: PUT /api/academic/grades/{id}/ — Faculty updates a single grade.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - academic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGradeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGradeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGradeRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Grade'
+                required:
+                - status
+                - message
+          description: ''
+  /api/academic/grades/bulk/:
+    post:
+      operationId: academic_grades_bulk_create
+      description: POST /api/academic/grades/bulk/ — Faculty bulk-submits grades.
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/academic/history/:
+    get:
+      operationId: academic_history_retrieve
+      description: |-
+        GET /api/academic/history/?student=current
+        Returns semester-by-semester grade breakdown.
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/academic/history/summary/:
+    get:
+      operationId: academic_history_summary_retrieve
+      description: |-
+        GET /api/academic/history/summary/?student=current
+        Returns cumulative academic summary stats.
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/academic/records/:
+    get:
+      operationId: academic_records_list
+      description: |-
+        GET /api/academic/records/?search=&semester=&page=&page_size=8
+        Admin view of all grade records.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/PaginatedGradeList'
+                required:
+                - status
+                - message
+          description: ''
+  /api/academic/schedules/today/:
+    get:
+      operationId: academic_schedules_today_retrieve
+      description: |-
+        GET /api/academic/schedules/today/?role=faculty|student
+        Returns today's and tomorrow's class schedules.
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/academic/transcript/:
+    get:
+      operationId: academic_transcript_retrieve
+      description: GET /api/academic/transcript/?student=current&format=pdf
+      tags:
+      - academic
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/forgot-password/:
+    post:
+      operationId: auth_forgot_password_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequestRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/PasswordResetRequest'
+                required:
+                - status
+                - message
+          description: ''
+  /api/auth/login/:
+    post:
+      operationId: auth_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Logout'
+                required:
+                - status
+                - message
+          description: ''
+  /api/auth/refresh/:
+    post:
+      operationId: auth_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/TokenRefresh'
+                required:
+                - status
+                - message
+          description: ''
+  /api/auth/reset-password/:
+    post:
+      operationId: auth_reset_password_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/PasswordResetConfirm'
+                required:
+                - status
+                - message
+          description: ''
+  /api/dashboard/admin/stats/:
+    get:
+      operationId: dashboard_admin_stats_retrieve
+      description: GET /api/dashboard/admin/stats/
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/dashboard/faculty/stats/:
+    get:
+      operationId: dashboard_faculty_stats_retrieve
+      description: GET /api/dashboard/faculty/stats/
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/dashboard/student/stats/:
+    get:
+      operationId: dashboard_student_stats_retrieve
+      description: GET /api/dashboard/student/stats/
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/users/faculty/:
+    get:
+      operationId: users_faculty_list
+      description: |-
+        GET  /api/users/faculty/?search=&page=&page_size=5
+        POST /api/users/faculty/
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/PaginatedFacultyList'
+                required:
+                - status
+                - message
+          description: ''
+    post:
+      operationId: users_faculty_create
+      description: |-
+        GET  /api/users/faculty/?search=&page=&page_size=5
+        POST /api/users/faculty/
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacultyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FacultyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FacultyRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Faculty'
+                required:
+                - status
+                - message
+          description: ''
+  /api/users/faculty/{faculty_id}/:
+    get:
+      operationId: users_faculty_retrieve
+      description: |-
+        GET    /api/users/faculty/{faculty_id}/
+        PUT    /api/users/faculty/{faculty_id}/
+        DELETE /api/users/faculty/{faculty_id}/
+      parameters:
+      - in: path
+        name: faculty_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Faculty'
+                required:
+                - status
+                - message
+          description: ''
+    put:
+      operationId: users_faculty_update
+      description: |-
+        GET    /api/users/faculty/{faculty_id}/
+        PUT    /api/users/faculty/{faculty_id}/
+        DELETE /api/users/faculty/{faculty_id}/
+      parameters:
+      - in: path
+        name: faculty_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacultyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FacultyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FacultyRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Faculty'
+                required:
+                - status
+                - message
+          description: ''
+    patch:
+      operationId: users_faculty_partial_update
+      description: |-
+        GET    /api/users/faculty/{faculty_id}/
+        PUT    /api/users/faculty/{faculty_id}/
+        DELETE /api/users/faculty/{faculty_id}/
+      parameters:
+      - in: path
+        name: faculty_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFacultyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFacultyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFacultyRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Faculty'
+                required:
+                - status
+                - message
+          description: ''
+    delete:
+      operationId: users_faculty_destroy
+      description: |-
+        GET    /api/users/faculty/{faculty_id}/
+        PUT    /api/users/faculty/{faculty_id}/
+        DELETE /api/users/faculty/{faculty_id}/
+      parameters:
+      - in: path
+        name: faculty_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/students/:
+    get:
+      operationId: users_students_list
+      description: |-
+        GET  /api/users/students/?search=&page=&page_size=5
+        POST /api/users/students/
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/PaginatedStudentList'
+                required:
+                - status
+                - message
+          description: ''
+    post:
+      operationId: users_students_create
+      description: |-
+        GET  /api/users/students/?search=&page=&page_size=5
+        POST /api/users/students/
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Student'
+                required:
+                - status
+                - message
+          description: ''
+  /api/users/students/{student_id}/:
+    get:
+      operationId: users_students_retrieve
+      description: |-
+        GET    /api/users/students/{student_id}/
+        PUT    /api/users/students/{student_id}/
+        DELETE /api/users/students/{student_id}/
+      parameters:
+      - in: path
+        name: student_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Student'
+                required:
+                - status
+                - message
+          description: ''
+    put:
+      operationId: users_students_update
+      description: |-
+        GET    /api/users/students/{student_id}/
+        PUT    /api/users/students/{student_id}/
+        DELETE /api/users/students/{student_id}/
+      parameters:
+      - in: path
+        name: student_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StudentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Student'
+                required:
+                - status
+                - message
+          description: ''
+    patch:
+      operationId: users_students_partial_update
+      description: |-
+        GET    /api/users/students/{student_id}/
+        PUT    /api/users/students/{student_id}/
+        DELETE /api/users/students/{student_id}/
+      parameters:
+      - in: path
+        name: student_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStudentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStudentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStudentRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Operation successful
+                  data:
+                    $ref: '#/components/schemas/Student'
+                required:
+                - status
+                - message
+          description: ''
+    delete:
+      operationId: users_students_destroy
+      description: |-
+        GET    /api/users/students/{student_id}/
+        PUT    /api/users/students/{student_id}/
+        DELETE /api/users/students/{student_id}/
+      parameters:
+      - in: path
+        name: student_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Course:
+      type: object
+      description: Flat course+schedule payload matching ManageCourses.jsx form.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 200
+        department:
+          type: string
+          maxLength: 100
+        credits:
+          type: integer
+          maximum: 6
+          minimum: 1
+        semester:
+          type: string
+          maxLength: 50
+        days: {}
+        start_time:
+          type: string
+          format: time
+          nullable: true
+        end_time:
+          type: string
+          format: time
+          nullable: true
+        room:
+          type: string
+          maxLength: 50
+        building:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+      required:
+      - code
+      - credits
+      - department
+      - id
+      - name
+    CourseRequest:
+      type: object
+      description: Flat course+schedule payload matching ManageCourses.jsx form.
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 20
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        department:
+          type: string
+          minLength: 1
+          maxLength: 100
+        credits:
+          type: integer
+          maximum: 6
+          minimum: 1
+        semester:
+          type: string
+          maxLength: 50
+        days: {}
+        start_time:
+          type: string
+          format: time
+          nullable: true
+        end_time:
+          type: string
+          format: time
+          nullable: true
+        room:
+          type: string
+          maxLength: 50
+        building:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+      required:
+      - code
+      - credits
+      - department
+      - name
+    CustomTokenObtainPairRequest:
+      type: object
+      description: Returns JWT tokens + user info matching frontend LoginPage expectations.
+      properties:
+        email:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+    Enrollment:
+      type: object
+      description: Accepts { student_id, course_code } from StudentEnrollment.jsx.
+      properties:
+        student_id:
+          type: string
+        course_code:
+          type: string
+      required:
+      - course_code
+      - student_id
+    EnrollmentRequest:
+      type: object
+      description: Accepts { student_id, course_code } from StudentEnrollment.jsx.
+      properties:
+        student_id:
+          type: string
+          minLength: 1
+        course_code:
+          type: string
+          minLength: 1
+      required:
+      - course_code
+      - student_id
+    Faculty:
+      type: object
+      description: |-
+        Accepts flat payload from frontend:
+        { faculty_id, name, email, password, department, specialization, join_date }
+        Creates/updates both User and Faculty records.
+      properties:
+        faculty_id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+        department:
+          type: string
+          maxLength: 100
+        specialization:
+          type: string
+          maxLength: 200
+        join_date:
+          type: string
+          format: date
+      required:
+      - department
+      - email
+      - faculty_id
+      - join_date
+      - name
+      - specialization
+    FacultyCourseAssignment:
+      type: object
+      description: Accepts { faculty_id, course_id } from AssignCourses.jsx.
+      properties:
+        faculty_id:
+          type: string
+        course_id:
+          type: integer
+        course_code:
+          type: string
+      required:
+      - faculty_id
+    FacultyCourseAssignmentRequest:
+      type: object
+      description: Accepts { faculty_id, course_id } from AssignCourses.jsx.
+      properties:
+        faculty_id:
+          type: string
+          minLength: 1
+        course_id:
+          type: integer
+        course_code:
+          type: string
+          minLength: 1
+      required:
+      - faculty_id
+    FacultyRequest:
+      type: object
+      description: |-
+        Accepts flat payload from frontend:
+        { faculty_id, name, email, password, department, specialization, join_date }
+        Creates/updates both User and Faculty records.
+      properties:
+        faculty_id:
+          type: string
+          minLength: 1
+          maxLength: 20
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        department:
+          type: string
+          minLength: 1
+          maxLength: 100
+        specialization:
+          type: string
+          minLength: 1
+          maxLength: 200
+        join_date:
+          type: string
+          format: date
+      required:
+      - department
+      - email
+      - faculty_id
+      - join_date
+      - name
+      - specialization
+    Grade:
+      type: object
+      description: For reading and updating individual grades.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student_id:
+          type: string
+          readOnly: true
+        student_name:
+          type: string
+          readOnly: true
+        course_code:
+          type: string
+          readOnly: true
+        course_name:
+          type: string
+          readOnly: true
+        grade:
+          enum:
+          - A
+          - A-
+          - B+
+          - B
+          - B-
+          - C+
+          - C
+          - C-
+          - D
+          - F
+          type: string
+          description: |-
+            * `A` - A
+            * `A-` - A-
+            * `B+` - B+
+            * `B` - B
+            * `B-` - B-
+            * `C+` - C+
+            * `C` - C
+            * `C-` - C-
+            * `D` - D
+            * `F` - F
+          x-spec-enum-id: 407b03beb0ddaae4
+        grade_points:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+          readOnly: true
+        credits:
+          type: integer
+          readOnly: true
+        semester:
+          type: string
+          readOnly: true
+      required:
+      - course_code
+      - course_name
+      - credits
+      - grade
+      - grade_points
+      - id
+      - semester
+      - student_id
+      - student_name
+    GradeRequest:
+      type: object
+      description: For reading and updating individual grades.
+      properties:
+        grade:
+          enum:
+          - A
+          - A-
+          - B+
+          - B
+          - B-
+          - C+
+          - C
+          - C-
+          - D
+          - F
+          type: string
+          description: |-
+            * `A` - A
+            * `A-` - A-
+            * `B+` - B+
+            * `B` - B
+            * `B-` - B-
+            * `C+` - C+
+            * `C` - C
+            * `C-` - C-
+            * `D` - D
+            * `F` - F
+          x-spec-enum-id: 407b03beb0ddaae4
+      required:
+      - grade
+    Logout:
+      type: object
+      properties:
+        refresh:
+          type: string
+      required:
+      - refresh
+    LogoutRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    PaginatedCourseList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Course'
+    PaginatedFacultyList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Faculty'
+    PaginatedGradeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Grade'
+    PaginatedStudentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Student'
+    PasswordResetConfirm:
+      type: object
+      properties:
+        token:
+          type: string
+        uidb64:
+          type: string
+      required:
+      - token
+      - uidb64
+    PasswordResetConfirmRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+        uidb64:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - new_password
+      - token
+      - uidb64
+    PasswordResetRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    PasswordResetRequestRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    PatchedCourseRequest:
+      type: object
+      description: Flat course+schedule payload matching ManageCourses.jsx form.
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 20
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        department:
+          type: string
+          minLength: 1
+          maxLength: 100
+        credits:
+          type: integer
+          maximum: 6
+          minimum: 1
+        semester:
+          type: string
+          maxLength: 50
+        days: {}
+        start_time:
+          type: string
+          format: time
+          nullable: true
+        end_time:
+          type: string
+          format: time
+          nullable: true
+        room:
+          type: string
+          maxLength: 50
+        building:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+    PatchedFacultyRequest:
+      type: object
+      description: |-
+        Accepts flat payload from frontend:
+        { faculty_id, name, email, password, department, specialization, join_date }
+        Creates/updates both User and Faculty records.
+      properties:
+        faculty_id:
+          type: string
+          minLength: 1
+          maxLength: 20
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        department:
+          type: string
+          minLength: 1
+          maxLength: 100
+        specialization:
+          type: string
+          minLength: 1
+          maxLength: 200
+        join_date:
+          type: string
+          format: date
+    PatchedGradeRequest:
+      type: object
+      description: For reading and updating individual grades.
+      properties:
+        grade:
+          enum:
+          - A
+          - A-
+          - B+
+          - B
+          - B-
+          - C+
+          - C
+          - C-
+          - D
+          - F
+          type: string
+          description: |-
+            * `A` - A
+            * `A-` - A-
+            * `B+` - B+
+            * `B` - B
+            * `B-` - B-
+            * `C+` - C+
+            * `C` - C
+            * `C-` - C-
+            * `D` - D
+            * `F` - F
+          x-spec-enum-id: 407b03beb0ddaae4
+    PatchedStudentRequest:
+      type: object
+      description: |-
+        Accepts flat payload from frontend:
+        { student_id, name, email, password, major, year, gpa }
+        Creates/updates both User and Student records.
+      properties:
+        student_id:
+          type: string
+          minLength: 1
+          maxLength: 20
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        major:
+          type: string
+          minLength: 1
+          maxLength: 100
+        year:
+          enum:
+          - 1st
+          - 2nd
+          - 3rd
+          - 4th
+          type: string
+          description: |-
+            * `1st` - 1st
+            * `2nd` - 2nd
+            * `3rd` - 3rd
+            * `4th` - 4th
+          x-spec-enum-id: cb5479ff26bfcdcd
+        gpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+    Student:
+      type: object
+      description: |-
+        Accepts flat payload from frontend:
+        { student_id, name, email, password, major, year, gpa }
+        Creates/updates both User and Student records.
+      properties:
+        student_id:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+        major:
+          type: string
+          maxLength: 100
+        year:
+          enum:
+          - 1st
+          - 2nd
+          - 3rd
+          - 4th
+          type: string
+          description: |-
+            * `1st` - 1st
+            * `2nd` - 2nd
+            * `3rd` - 3rd
+            * `4th` - 4th
+          x-spec-enum-id: cb5479ff26bfcdcd
+        gpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+      required:
+      - email
+      - gpa
+      - major
+      - name
+      - student_id
+      - year
+    StudentRequest:
+      type: object
+      description: |-
+        Accepts flat payload from frontend:
+        { student_id, name, email, password, major, year, gpa }
+        Creates/updates both User and Student records.
+      properties:
+        student_id:
+          type: string
+          minLength: 1
+          maxLength: 20
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        major:
+          type: string
+          minLength: 1
+          maxLength: 100
+        year:
+          enum:
+          - 1st
+          - 2nd
+          - 3rd
+          - 4th
+          type: string
+          description: |-
+            * `1st` - 1st
+            * `2nd` - 2nd
+            * `3rd` - 3rd
+            * `4th` - 4th
+          x-spec-enum-id: cb5479ff26bfcdcd
+        gpa:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,2}(?:\.\d{0,2})?$
+      required:
+      - email
+      - gpa
+      - major
+      - name
+      - student_id
+      - year
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+      required:
+      - access
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - refresh
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

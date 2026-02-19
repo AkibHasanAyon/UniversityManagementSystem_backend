@@ -137,10 +137,13 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'University Management System API',
-    'DESCRIPTION': 'API documentation for the University Management System',
+    'DESCRIPTION': 'API documentation for the University Management System. Note: All responses are wrapped in a standard envelope: `{ "status": "...", "message": "...", "data": ... }`.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
+    'POSTPROCESSING_HOOKS': [
+        'config.schema.standard_response_postprocessor'
+    ],
 }
 
 from datetime import timedelta

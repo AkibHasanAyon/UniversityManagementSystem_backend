@@ -1,876 +1,1366 @@
 {
-    "info": {
-        "_postman_id": "8b5f3a0c-6e2b-4e3a-9c7d-0d6f3e1b7c2a",
-        "name": "University Management System",
-        "description": "Comprehensive API collection for the University Management System.\n\n**Getting Started:**\n1. Run **Auth > Login** first. The tests script will automatically save `access_token` and `refresh_token` to your environment.\n2. Use these tokens for all other endpoints.\n\n**Roles:**\n- **Admin**: Full access to all endpoints\n- **Faculty**: Grading, Dashboard\n- **Student**: View grades, history, transcripts",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  "info": {
+    "_postman_id": "af13454f-3874-4837-94ee-533b328cca56",
+    "name": "University Management System",
+    "description": "Comprehensive API collection for the University Management System.\n\n**Getting Started:**\n\n1. Run **Auth > Login** first. The tests script will automatically save `access_token` and `refresh_token` to your environment.\n    \n2. Use these tokens for all other endpoints.\n    \n\n**Roles:**\n\n- **Admin**: Full access to all endpoints\n    \n- **Faculty**: Grading, Dashboard\n    \n- **Student**: View grades, history, transcripts",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49087419",
+    "_collection_link": "https://go.postman.co/collection/49087419-af13454f-3874-4837-94ee-533b328cca56?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"access_token\", jsonData.access);",
+                  "pm.environment.set(\"refresh_token\", jsonData.refresh);",
+                  "if(jsonData.user) {",
+                  "    pm.environment.set(\"user_role\", jsonData.user.role);",
+                  "    pm.environment.set(\"user_id\", jsonData.user.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\":\"admin@university.edu\",\n    \"password\":\"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login",
+                ""
+              ]
+            },
+            "description": "Authenticate using email and password. Returns JWT tokens and user info.\n\n**Required:** `email`, `password`"
+          },
+          "response": [
+            {
+              "name": "Admin Login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\":\"admin@university.edu\",\"password\":\"admin123\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "enabled": true
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"user\": {\n    \"id\": 1,\n    \"email\": \"admin@university.edu\",\n    \"role\": \"admin\",\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\"\n  }\n}"
+            },
+            {
+              "name": "Faculty Login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\":\"rahman@university.edu\",\"password\":\"faculty123\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "enabled": true
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"user\": {\n    \"id\": 2,\n    \"email\": \"rahman@university.edu\",\n    \"role\": \"faculty\",\n    \"first_name\": \"Rahman\",\n    \"last_name\": \"Ahmed\",\n    \"faculty_id\": \"FAC2024001\"\n  }\n}"
+            },
+            {
+              "name": "Student Login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\":\"ayesha@university.edu\",\"password\":\"student123\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login",
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "enabled": true
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"user\": {\n    \"id\": 3,\n    \"email\": \"ayesha@university.edu\",\n    \"role\": \"student\",\n    \"first_name\": \"Ayesha\",\n    \"last_name\": \"Khan\",\n    \"student_id\": \"STU2024001\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"access_token\", jsonData.access);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh",
+                ""
+              ]
+            },
+            "description": "Get a new access token using a valid refresh token."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout",
+                ""
+              ]
+            },
+            "description": "Blacklist the refresh token to prevent further access token generation."
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"akib.hasan1@northsouth.edu\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/forgot-password/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "forgot-password",
+                ""
+              ]
+            },
+            "description": "Trigger a password reset email."
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"uidb64\": \"<uid_from_email_link>\",\n    \"token\": \"<token_from_email_link>\",\n    \"new_password\": \"newpassword123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/reset-password/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "reset-password",
+                ""
+              ]
+            },
+            "description": "Complete the password reset process using the token from the email."
+          },
+          "response": []
+        }
+      ]
     },
-    "item": [
+    {
+      "name": "Users (Admin Only)",
+      "item": [
         {
-            "name": "Auth",
-            "item": [
+          "name": "List Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/students/?search=&page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "students",
+                ""
+              ],
+              "query": [
                 {
-                    "name": "Login",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "var jsonData = pm.response.json();",
-                                    "pm.environment.set(\"access_token\", jsonData.access);",
-                                    "pm.environment.set(\"refresh_token\", jsonData.refresh);",
-                                    "if(jsonData.user) {",
-                                    "    pm.environment.set(\"user_role\", jsonData.user.role);",
-                                    "    pm.environment.set(\"user_id\", jsonData.user.id);",
-                                    "}"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"email\": \"admin1@university.edu\",\n    \"password\": \"password\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/auth/login/",
-                        "description": "Authenticate using email and password. Returns JWT tokens and user info.\n\n**Required:** `email`, `password`"
-                    }
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by name, email, or student_id"
                 },
                 {
-                    "name": "Refresh Token",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "var jsonData = pm.response.json();",
-                                    "pm.environment.set(\"access_token\", jsonData.access);"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/auth/refresh/",
-                        "description": "Get a new access token using a valid refresh token."
-                    }
+                  "key": "page",
+                  "value": "1"
                 },
                 {
-                    "name": "Logout",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/auth/logout/",
-                        "description": "Blacklist the refresh token to prevent further access token generation."
-                    }
-                },
-                {
-                    "name": "Forgot Password",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"email\": \"student@university.edu\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/auth/forgot-password/",
-                        "description": "Trigger a password reset email."
-                    }
-                },
-                {
-                    "name": "Reset Password",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"uidb64\": \"<uid_from_email_link>\",\n    \"token\": \"<token_from_email_link>\",\n    \"new_password\": \"newpassword123\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/auth/reset-password/",
-                        "description": "Complete the password reset process using the token from the email."
-                    }
+                  "key": "page_size",
+                  "value": "5"
                 }
-            ]
+              ]
+            },
+            "description": "Get a paginated list of students."
+          },
+          "response": []
         },
         {
-            "name": "Users (Admin Only)",
-            "item": [
-                {
-                    "name": "List Students",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/users/students/?search=&page=1&page_size=5",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users",
-                                "students",
-                                ""
-                            ],
-                            "query": [
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Search by name, email, or student_id"
-                                },
-                                {
-                                    "key": "page",
-                                    "value": "1"
-                                },
-                                {
-                                    "key": "page_size",
-                                    "value": "5"
-                                }
-                            ]
-                        },
-                        "description": "Get a paginated list of students."
-                    }
-                },
-                {
-                    "name": "Create Student",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"student_id\": \"STU2024001\",\n    \"name\": \"Alice Wonderland\",\n    \"email\": \"alice@university.edu\",\n    \"password\": \"password123\",\n    \"major\": \"Computer Science\",\n    \"year\": \"1st\",\n    \"gpa\": 3.80\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/users/students/",
-                        "description": "Create a new student account.\n\n**Required:**\n- `student_id` (unique)\n- `name` (Full Name)\n- `email` (unique)\n- `major`\n- `year` ('1st', '2nd', '3rd', '4th')\n- `gpa` (decimal)"
-                    }
-                },
-                {
-                    "name": "Get Student",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/users/students/STU2024001/",
-                        "description": "Retrieve student details by student_id."
-                    }
-                },
-                {
-                    "name": "Update Student",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"student_id\": \"STU2024001\",\n    \"name\": \"Alice W. Land\",\n    \"email\": \"alice.w@university.edu\",\n    \"password\": \"newpassword123\",\n    \"major\": \"Data Science\",\n    \"year\": \"2nd\",\n    \"gpa\": 3.90\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/users/students/STU2024001/",
-                        "description": "Update student information. Fields not provided will remain unchanged."
-                    }
-                },
-                {
-                    "name": "Delete Student",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/users/students/STU2024001/",
-                        "description": "Permanently delete a student and their user account."
-                    }
-                },
-                {
-                    "name": "List Faculty",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/users/faculty/?search=&page=1&page_size=5",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users",
-                                "faculty",
-                                ""
-                            ],
-                            "query": [
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Search by name, email, department"
-                                },
-                                {
-                                    "key": "page",
-                                    "value": "1"
-                                },
-                                {
-                                    "key": "page_size",
-                                    "value": "5"
-                                }
-                            ]
-                        },
-                        "description": "Get a paginated list of faculty members."
-                    }
-                },
-                {
-                    "name": "Create Faculty",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"faculty_id\": \"FAC2024001\",\n    \"name\": \"Dr. John Smith\",\n    \"email\": \"john.smith@university.edu\",\n    \"password\": \"password123\",\n    \"department\": \"Computer Science\",\n    \"specialization\": \"AI & Machine Learning\",\n    \"join_date\": \"2024-01-15\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/users/faculty/",
-                        "description": "Create a new faculty account.\n\n**Required:**\n- `faculty_id`\n- `name`\n- `email`\n- `department`\n- `specialization`\n- `join_date` (YYYY-MM-DD)"
-                    }
-                },
-                {
-                    "name": "Get Faculty",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/users/faculty/FAC2024001/",
-                        "description": "Retrieve faculty details by faculty_id."
-                    }
-                },
-                {
-                    "name": "Update Faculty",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"faculty_id\": \"FAC2024001\",\n    \"name\": \"Dr. John Smith\",\n    \"email\": \"john.smith@university.edu\",\n    \"password\": \"newpassword123\",\n    \"department\": \"Computer Science\",\n    \"specialization\": \"AI & Machine Learning\",\n    \"join_date\": \"2024-01-15\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/users/faculty/FAC2024001/",
-                        "description": "Update faculty details."
-                    }
-                },
-                {
-                    "name": "Delete Faculty",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/users/faculty/FAC2024001/",
-                        "description": "Permanently delete a faculty member."
-                    }
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"student_id\": \"STU2025004\",\n    \"name\": \"Akib Hayfuyfan\",\n    \"email\": \"akib.hasan2@northsouth.edu\",\n    \"password\": \"akibhasan\",\n    \"major\": \"Computer Science and Engneering\",\n    \"year\": \"1st\",\n    \"gpa\": 3.80\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-            ]
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/students/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "students",
+                ""
+              ]
+            },
+            "description": "Create a new student account.\n\n**Required:**\n- `student_id` (unique)\n- `name` (Full Name)\n- `email` (unique)\n- `major`\n- `year` ('1st', '2nd', '3rd', '4th')\n- `gpa` (decimal)"
+          },
+          "response": []
         },
         {
-            "name": "Academic Management",
-            "item": [
-                {
-                    "name": "List Courses",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/academic/courses/?search=&faculty=",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "academic",
-                                "courses",
-                                ""
-                            ],
-                            "query": [
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Search by code or name"
-                                },
-                                {
-                                    "key": "faculty",
-                                    "value": "",
-                                    "description": "Set to 'current' to see only assigned courses"
-                                }
-                            ]
-                        },
-                        "description": "List all courses. Faculty user `faculty=current` to see their assigned courses."
-                    }
-                },
-                {
-                    "name": "Create Course",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"code\": \"CSE101\",\n    \"name\": \"Introduction to Programming\",\n    \"department\": \"Computer Science\",\n    \"credits\": 3,\n    \"semester\": \"Spring 2026\",\n    \"days\": [\"Mon\", \"Wed\"],\n    \"start_time\": \"09:00\",\n    \"end_time\": \"10:30\",\n    \"room\": \"Room 101\",\n    \"building\": \"Tech Block A\",\n    \"description\": \"Basic programming concepts using Python.\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/academic/courses/",
-                        "description": "Create a new course.\n\n**Required:**\n- `code` (unique)\n- `name`\n- `department`\n- `credits` (1-6)\n\n**Optional:**\n- `days` (Array of strings e.g. [\"Mon\", \"Wed\"])\n- `start_time` / `end_time` (HH:MM)\n- `room`, `building`"
-                    }
-                },
-                {
-                    "name": "Update Course",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"code\": \"CSE101\",\n    \"name\": \"Advanced Programming\",\n    \"department\": \"Computer Science\",\n    \"credits\": 4,\n    \"semester\": \"Spring 2026\",\n    \"days\": [\"Mon\", \"Wed\", \"Fri\"],\n    \"start_time\": \"09:00\",\n    \"end_time\": \"10:30\",\n    \"room\": \"Lab 2\",\n    \"building\": \"Tech Block B\",\n    \"description\": \"Advanced concepts including concurrency and design patterns.\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/academic/courses/1/",
-                        "description": "Update course details by ID."
-                    }
-                },
-                {
-                    "name": "Delete Course",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/academic/courses/1/",
-                        "description": "Delete a course by ID."
-                    }
-                },
-                {
-                    "name": "Assign Faculty to Course",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"faculty_id\": \"FAC2024001\",\n    \"course_code\": \"CSE101\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/academic/assignments/",
-                        "description": "Assign a faculty member to a course.\n\n**Required:**\n- `faculty_id`\n- `course_code` (or `course_id`)"
-                    }
-                },
-                {
-                    "name": "Enroll Student",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"student_id\": \"STU2024001\",\n    \"course_code\": \"CSE101\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/academic/enrollments/",
-                        "description": "Enroll a student in a course.\n\n**Required:**\n- `student_id`\n- `course_code`"
-                    }
-                },
-                {
-                    "name": "List Enrollments",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/academic/enrollments/?search=&student=&course=",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "academic",
-                                "enrollments",
-                                ""
-                            ],
-                            "query": [
-                                {
-                                    "key": "search",
-                                    "value": "",
-                                    "description": "Search by student/course"
-                                },
-                                {
-                                    "key": "student",
-                                    "value": "",
-                                    "description": "Set to 'current' for student specific"
-                                },
-                                {
-                                    "key": "course",
-                                    "value": "",
-                                    "description": "Filter by course code"
-                                }
-                            ]
-                        },
-                        "description": "View enrollments. Supports filtering."
-                    }
-                }
-            ]
+          "name": "Get Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/students/STU2025001/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "students",
+                "STU2025001",
+                ""
+              ]
+            },
+            "description": "Retrieve student details by student_id."
+          },
+          "response": []
         },
         {
-            "name": "Grading & Records",
-            "item": [
-                {
-                    "name": "List Grades",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/academic/grades/?faculty=current",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "academic",
-                                "grades",
-                                ""
-                            ],
-                            "query": [
-                                {
-                                    "key": "faculty",
-                                    "value": "current",
-                                    "description": "Show grades submitted by me"
-                                }
-                            ]
-                        },
-                        "description": "View submitted grades."
-                    }
-                },
-                {
-                    "name": "Bulk Submit Grades",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"course_code\": \"CSE101\",\n    \"grades\": [\n        { \"student_id\": \"STU2024001\", \"grade\": \"A\" }\n    ]\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/academic/grades/bulk/",
-                        "description": "Faculty can submit multiple grades at once.\n\n**Valid Grades**: A, A-, B+, B, B-, C+, C, C-, D, F"
-                    }
-                },
-                {
-                    "name": "Update Grade",
-                    "request": {
-                        "method": "PUT",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            },
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"grade\": \"A-\"\n}",
-                            "options": {
-                                "raw": {
-                                    "language": "json"
-                                }
-                            }
-                        },
-                        "url": "{{base_url}}/api/academic/grades/1/",
-                        "description": "Update a specific grade entry by ID."
-                    }
-                },
-                {
-                    "name": "Academic Records (Admin)",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/academic/records/",
-                        "description": "Admin view of all academic records across the university."
-                    }
+          "name": "Update Student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"student_id\": \"STU2025001\",\n    \"name\": \"Akib Hasan\",\n    \"email\": \"akib.hasan1@northsouth.edu\",\n    \"major\": \"Computer Science and Engneering\",\n    \"year\": \"3rd\",\n    \"gpa\": \"3.90\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
                 }
-            ]
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/students/STU2025001/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "students",
+                "STU2025001",
+                ""
+              ]
+            },
+            "description": "Update student information. Fields not provided will remain unchanged."
+          },
+          "response": []
         },
         {
-            "name": "Student View",
-            "item": [
-                {
-                    "name": "My Schedule",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/academic/schedules/today/?role=student",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "academic",
-                                "schedules",
-                                "today",
-                                ""
-                            ],
-                            "query": [
-                                {
-                                    "key": "role",
-                                    "value": "student"
-                                }
-                            ]
-                        },
-                        "description": "Get class schedule for today and tomorrow."
-                    }
-                },
-                {
-                    "name": "Academic History",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/academic/history/",
-                        "description": "Get detailed semester-by-semester grade history."
-                    }
-                },
-                {
-                    "name": "Academic Summary",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/academic/history/summary/",
-                        "description": "Get cumulative GPA and total credits."
-                    }
-                },
-                {
-                    "name": "Download Transcript",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/academic/transcript/",
-                        "description": "Download official transcript PDF."
-                    }
-                }
-            ]
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/students/STU2025004/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "students",
+                "STU2025004",
+                ""
+              ]
+            },
+            "description": "Permanently delete a student and their user account."
+          },
+          "response": []
         },
         {
-            "name": "Dashboard",
-            "item": [
+          "name": "List Faculty",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/faculty/?search=&page=1&page_size=5",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "faculty",
+                ""
+              ],
+              "query": [
                 {
-                    "name": "Admin Stats",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/dashboard/admin/stats/",
-                        "description": "Admin dashboard statistics."
-                    }
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by name, email, department"
                 },
                 {
-                    "name": "Faculty Stats",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/dashboard/faculty/stats/",
-                        "description": "Faculty dashboard statistics."
-                    }
+                  "key": "page",
+                  "value": "1"
                 },
                 {
-                    "name": "Student Stats",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{access_token}}"
-                            }
-                        ],
-                        "url": "{{base_url}}/api/dashboard/student/stats/",
-                        "description": "Student dashboard statistics."
-                    }
+                  "key": "page_size",
+                  "value": "5"
                 }
-            ]
+              ]
+            },
+            "description": "Get a paginated list of faculty members."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Faculty",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"faculty_id\": \"FAC2024001\",\n    \"name\": \"Dr. John Smith\",\n    \"email\": \"john.smith@university.edu\",\n    \"password\": \"password123\",\n    \"department\": \"Computer Science\",\n    \"specialization\": \"AI & Machine Learning\",\n    \"join_date\": \"2024-01-15\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/faculty/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "faculty",
+                ""
+              ]
+            },
+            "description": "Create a new faculty account.\n\n**Required:**\n- `faculty_id`\n- `name`\n- `email`\n- `department`\n- `specialization`\n- `join_date` (YYYY-MM-DD)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Faculty",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/faculty/FAC2024001/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "faculty",
+                "FAC2024001",
+                ""
+              ]
+            },
+            "description": "Retrieve faculty details by faculty_id."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Faculty",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"faculty_id\": \"FAC2024001\",\n    \"name\": \"Dr. John Smith\",\n    \"email\": \"john.smith@university.edu\",\n    \"department\": \"Computer Science\",\n    \"specialization\": \"Machine Learning & Deep Learning\",\n    \"join_date\": \"2024-01-15\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/faculty/FAC2024001/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "faculty",
+                "FAC2024001",
+                ""
+              ]
+            },
+            "description": "Update faculty details."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Faculty",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/faculty/FAC2024001/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "faculty",
+                "FAC2024001",
+                ""
+              ]
+            },
+            "description": "Permanently delete a faculty member."
+          },
+          "response": []
         }
-    ],
-    "variable": [
+      ]
+    },
+    {
+      "name": "Academic Management",
+      "item": [
         {
-            "key": "base_url",
-            "value": "https://vondobaba.pythonanywhere.com",
-            "type": "string"
+          "name": "List Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academic/courses/?search=&faculty=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "courses",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by code or name"
+                },
+                {
+                  "key": "faculty",
+                  "value": "",
+                  "description": "Set to 'current' to see only assigned courses"
+                }
+              ]
+            },
+            "description": "List all courses. Faculty user `faculty=current` to see their assigned courses."
+          },
+          "response": []
         },
         {
-            "key": "access_token",
-            "value": "",
-            "type": "string"
+          "name": "Create Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"CSE102\",\n    \"name\": \"Introduction to Programming 2\",\n    \"department\": \"Computer Science\",\n    \"credits\": 3,\n    \"semester\": \"Spring 2026\",\n    \"days\": [\"Mon\", \"Wed\"],\n    \"start_time\": \"09:00\",\n    \"end_time\": \"10:30\",\n    \"room\": \"Room 101\",\n    \"building\": \"Tech Block A\",\n    \"description\": \"Basic programming concepts using Python.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/academic/courses/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "courses",
+                ""
+              ]
+            },
+            "description": "Create a new course.\n\n**Required:**\n- `code` (unique)\n- `name`\n- `department`\n- `credits` (1-6)\n\n**Optional:**\n- `days` (Array of strings e.g. [\"Mon\", \"Wed\"])\n- `start_time` / `end_time` (HH:MM)\n- `room`, `building`"
+          },
+          "response": []
         },
         {
-            "key": "refresh_token",
-            "value": "",
-            "type": "string"
+          "name": "Update Course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"CSE101\",\n    \"name\": \"Advanced Programming\",\n    \"department\": \"Computer Science\",\n    \"credits\": 4,\n    \"room\": \"Lab 2\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/academic/courses/9/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "courses",
+                "9",
+                ""
+              ]
+            },
+            "description": "Update course details by ID."
+          },
+          "response": []
         },
         {
-            "key": "user_role",
-            "value": "",
-            "type": "string"
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academic/courses/1/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "courses",
+                "1",
+                ""
+              ]
+            },
+            "description": "Delete a course by ID."
+          },
+          "response": []
         },
         {
-            "key": "user_id",
-            "value": "",
-            "type": "string"
+          "name": "Assign Faculty to Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"faculty_id\": \"FAC2024001\",\n    \"course_code\": \"CSE101\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/academic/assignments/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "assignments",
+                ""
+              ]
+            },
+            "description": "Assign a faculty member to a course.\n\n**Required:**\n- `faculty_id`\n- `course_code` (or `course_id`)"
+          },
+          "response": []
+        },
+        {
+          "name": "Enroll Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"student_id\": \"STU001\",\n    \"course_code\": \"CSE102\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/academic/enrollments/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "enrollments",
+                ""
+              ]
+            },
+            "description": "Enroll a student in a course.\n\n**Required:**\n- `student_id`\n- `course_code`"
+          },
+          "response": []
+        },
+        {
+          "name": "List Enrollments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academic/enrollments/?course=CSE102",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "enrollments",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by student/course",
+                  "disabled": true
+                },
+                {
+                  "key": "student",
+                  "value": "",
+                  "description": "Set to 'current' for student specific",
+                  "disabled": true
+                },
+                {
+                  "key": "course",
+                  "value": "CSE102",
+                  "description": "Filter by course code"
+                }
+              ]
+            },
+            "description": "View enrollments. Supports filtering."
+          },
+          "response": []
         }
-    ]
+      ]
+    },
+    {
+      "name": "Grading & Records",
+      "item": [
+        {
+          "name": "List Grades",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academic/grades/?faculty=current",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "grades",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "faculty",
+                  "value": "current",
+                  "description": "Show grades submitted by me"
+                }
+              ]
+            },
+            "description": "View submitted grades."
+          },
+          "response": []
+        },
+        {
+          "name": "Bulk Submit Grades",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"course_code\": \"CSE101\",\n    \"grades\": [\n        { \"student_id\": \"STU2025001\", \"grade\": \"A\" }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/academic/grades/bulk/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "grades",
+                "bulk",
+                ""
+              ]
+            },
+            "description": "Faculty can submit multiple grades at once.\n\n**Valid Grades**: A, A-, B+, B, B-, C+, C, C-, D, F"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Grade",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"grade\": \"A-\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/academic/grades/1/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "grades",
+                "1",
+                ""
+              ]
+            },
+            "description": "Update a specific grade entry by ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Academic Records (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academic/records/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "records",
+                ""
+              ]
+            },
+            "description": "Admin view of all academic records across the university."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Student View",
+      "item": [
+        {
+          "name": "My Schedule",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academic/schedules/today/?role=student",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "schedules",
+                "today",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "student"
+                }
+              ]
+            },
+            "description": "Get class schedule for today and tomorrow."
+          },
+          "response": []
+        },
+        {
+          "name": "Academic History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academic/history/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "history",
+                ""
+              ]
+            },
+            "description": "Get detailed semester-by-semester grade history."
+          },
+          "response": []
+        },
+        {
+          "name": "Academic Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academic/history/summary/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "history",
+                "summary",
+                ""
+              ]
+            },
+            "description": "Get cumulative GPA and total credits."
+          },
+          "response": []
+        },
+        {
+          "name": "Download Transcript",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/academic/transcript/?=",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "academic",
+                "transcript",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Download official transcript PDF."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Admin Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/admin/stats/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "admin",
+                "stats",
+                ""
+              ]
+            },
+            "description": "Admin dashboard statistics."
+          },
+          "response": []
+        },
+        {
+          "name": "Faculty Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/faculty/stats/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "faculty",
+                "stats",
+                ""
+              ]
+            },
+            "description": "Faculty dashboard statistics."
+          },
+          "response": []
+        },
+        {
+          "name": "Student Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/student/stats/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "student",
+                "stats",
+                ""
+              ]
+            },
+            "description": "Student dashboard statistics."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:1111/"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    },
+    {
+      "key": "user_role",
+      "value": ""
+    },
+    {
+      "key": "user_id",
+      "value": ""
+    }
+  ]
 }
