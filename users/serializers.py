@@ -19,19 +19,22 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         user = self.user
 
+        # Superuser hole role 'admin' set kora hocche, regardless of DB value.
+        role = 'admin' if user.is_superuser else user.role
+
         # Build the user response with role-specific ID
         user_data = {
-            'role': user.role,
+            'role': role,
             'name': user.get_full_name() or user.username,
             'email': user.email,
         }
 
         # User er role check kore specific ID add kora hocche.
-        if user.role == 'student' and hasattr(user, 'student_profile'):
+        if role == 'student' and hasattr(user, 'student_profile'):
             user_data['id'] = user.student_profile.student_id
-        elif user.role == 'faculty' and hasattr(user, 'faculty_profile'):
+        elif role == 'faculty' and hasattr(user, 'faculty_profile'):
             user_data['id'] = user.faculty_profile.faculty_id
-        elif user.role == 'admin':
+        elif role == 'admin':
             user_data['id'] = f"ADM{user.pk:03d}"
 
         data['user'] = user_data
