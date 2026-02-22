@@ -3,8 +3,9 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     CustomTokenObtainPairView,
     LogoutView,
-    PasswordResetRequestView,
-    PasswordResetConfirmView,
+    ForgotPasswordView,
+    VerifyOTPView,
+    ResetPasswordView,
     StudentListCreateView,
     StudentDetailView,
     FacultyListCreateView,
@@ -16,8 +17,9 @@ urlpatterns = [
     path('auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/logout/', LogoutView.as_view(), name='auth_logout'),
-    path('auth/forgot-password/', PasswordResetRequestView.as_view(), name='forgot_password'),
-    path('auth/reset-password/', PasswordResetConfirmView.as_view(), name='reset_password'),
+    path('auth/forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
+    path('auth/verify-otp/', VerifyOTPView.as_view(), name='verify_otp'),
+    path('auth/reset-password/', ResetPasswordView.as_view(), name='reset_password'),
 
     # Student Management (Admin)
     path('users/students/', StudentListCreateView.as_view(), name='student-list-create'),

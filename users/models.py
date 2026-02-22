@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
+from datetime import timedelta
 
 
 class User(AbstractUser):
@@ -49,3 +51,17 @@ class Faculty(models.Model):
     def __str__(self):
         # Faculty ID ebong full name return korbe.
         return f"{self.faculty_id} - {self.user.get_full_name()}"
+
+
+class PasswordResetOTP(models.Model):
+    """Stores 4-digit OTP for password reset flow."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_otps')
+    otp = models.CharField(max_length=4)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(minutes=5)
+
+    def __str__(self):
+        return f"OTP for {self.user.email} - {'Used' if self.is_used else 'Active'}"

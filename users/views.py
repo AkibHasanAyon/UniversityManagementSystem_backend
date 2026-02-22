@@ -4,21 +4,20 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
 from django.db.models import Q
+import random
 
 from .serializers import (
     CustomTokenObtainPairSerializer,
     LogoutSerializer,
-    PasswordResetRequestSerializer,
-    PasswordResetConfirmSerializer,
+    ForgotPasswordSerializer,
+    VerifyOTPSerializer,
+    ResetPasswordSerializer,
     StudentSerializer,
     FacultySerializer,
 )
-from .models import Student, Faculty
+from .models import Student, Faculty, PasswordResetOTP
 from .permissions import IsAdminUser
 
 User = get_user_model()
@@ -41,8 +40,9 @@ class LogoutView(generics.GenericAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class PasswordResetRequestView(generics.GenericAPIView):
-    serializer_class = PasswordResetRequestSerializer
+class ForgotPasswordView(generics.GenericAPIView):
+    """Step 1: Send 4-digit OTP to user's email."""
+    serializer_class = ForgotPasswordSerializer
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -51,30 +51,61 @@ class PasswordResetRequestView(generics.GenericAPIView):
         email = serializer.validated_data['email']
         user = User.objects.get(email=email)
 
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = PasswordResetTokenGenerator().make_token(user)
-        reset_link = f"http://localhost:3000/reset-password?uid={uid}&token={token}"
+        # Invalidate all previous unused OTPs for this user
+        PasswordResetOTP.objects.filter(user=user, is_used=False).update(is_used=True)
 
+        # Generate new 4-digit OTP
+        otp_code = f"{random.randint(1000, 9999)}"
+
+        # Save to database
+        PasswordResetOTP.objects.create(user=user, otp=otp_code)
+
+        # Send email
         send_mail(
-            'Password Reset Request',
-            f'Click the link to reset your password: {reset_link}',
-            'admin@university.edu',
-            [email],
+            subject='University Portal - Password Reset OTP',
+            message=(
+                f'Hello {user.get_full_name() or user.username},\n\n'
+                f'Your password reset verification code is:\n\n'
+                f'    {otp_code}\n\n'
+                f'This code will expire in 5 minutes.\n\n'
+                f'If you did not request this, please ignore this email.\n\n'
+                f'- University Portal'
+            ),
+            from_email=None,  # Uses DEFAULT_FROM_EMAIL
+            recipient_list=[email],
             fail_silently=False,
         )
 
-        return Response({'message': 'Password reset link sent to email.'}, status=status.HTTP_200_OK)
+        return Response({
+            'message': 'OTP has been sent to your email address.'
+        }, status=status.HTTP_200_OK)
 
 
-class PasswordResetConfirmView(generics.GenericAPIView):
-    serializer_class = PasswordResetConfirmSerializer
+class VerifyOTPView(generics.GenericAPIView):
+    """Step 2: Verify OTP is correct and not expired."""
+    serializer_class = VerifyOTPSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response({
+            'message': 'OTP verified successfully.'
+        }, status=status.HTTP_200_OK)
+
+
+class ResetPasswordView(generics.GenericAPIView):
+    """Step 3: Reset password after OTP verification."""
+    serializer_class = ResetPasswordSerializer
     permission_classes = (AllowAny,)
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'message': 'Password reset successful.'}, status=status.HTTP_200_OK)
+        return Response({
+            'message': 'Password has been reset successfully.'
+        }, status=status.HTTP_200_OK)
 
 
 # ─── Pagination ────────────────────────────────────────────────────────────

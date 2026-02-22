@@ -2,11 +2,8 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import force_str, force_bytes
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
-from .models import Student, Faculty
+from .models import Student, Faculty, PasswordResetOTP
 
 User = get_user_model()
 
@@ -55,36 +52,81 @@ class LogoutSerializer(serializers.Serializer):
             pass
 
 
-class PasswordResetRequestSerializer(serializers.Serializer):
+class ForgotPasswordSerializer(serializers.Serializer):
+    """Step 1: Validate that the email exists."""
     email = serializers.EmailField()
 
     def validate_email(self, value):
         if not User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Account with this email does not exist.")
+            raise serializers.ValidationError("No account found with this email address.")
         return value
 
 
-class PasswordResetConfirmSerializer(serializers.Serializer):
-    token = serializers.CharField()
-    uidb64 = serializers.CharField()
-    new_password = serializers.CharField(write_only=True)
+class VerifyOTPSerializer(serializers.Serializer):
+    """Step 2: Validate OTP for the given email."""
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=4, min_length=4)
 
     def validate(self, attrs):
+        email = attrs['email']
+        otp = attrs['otp']
+
         try:
-            uid = force_str(urlsafe_base64_decode(attrs['uidb64']))
-            self.user = User.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            raise serializers.ValidationError("Invalid link")
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("No account found with this email address.")
 
-        if not PasswordResetTokenGenerator().check_token(self.user, attrs['token']):
-            raise serializers.ValidationError("Invalid or expired token")
+        otp_obj = PasswordResetOTP.objects.filter(
+            user=user, otp=otp, is_used=False
+        ).order_by('-created_at').first()
 
+        if not otp_obj:
+            raise serializers.ValidationError("Invalid OTP code.")
+
+        if otp_obj.is_expired():
+            raise serializers.ValidationError("OTP has expired. Please request a new one.")
+
+        attrs['user'] = user
+        attrs['otp_obj'] = otp_obj
+        return attrs
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    """Step 3: Verify OTP again and set new password."""
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=4, min_length=4)
+    new_password = serializers.CharField(write_only=True, min_length=6)
+
+    def validate(self, attrs):
+        email = attrs['email']
+        otp = attrs['otp']
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("No account found with this email address.")
+
+        otp_obj = PasswordResetOTP.objects.filter(
+            user=user, otp=otp, is_used=False
+        ).order_by('-created_at').first()
+
+        if not otp_obj:
+            raise serializers.ValidationError("Invalid OTP code.")
+
+        if otp_obj.is_expired():
+            raise serializers.ValidationError("OTP has expired. Please request a new one.")
+
+        attrs['user'] = user
+        attrs['otp_obj'] = otp_obj
         return attrs
 
     def save(self, **kwargs):
-        self.user.set_password(self.validated_data['new_password'])
-        self.user.save()
-        return self.user
+        user = self.validated_data['user']
+        otp_obj = self.validated_data['otp_obj']
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        otp_obj.is_used = True
+        otp_obj.save()
 
 
 # ─── Student Serializer (flat payload matching ManageStudents.jsx) ─────────

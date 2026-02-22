@@ -2,8 +2,10 @@ from rest_framework import permissions
 
 class IsAdminUser(permissions.BasePermission):
     def has_permission(self, request, view):
-        # Check korchi user authenticated ar admin kina.
-        return request.user and request.user.is_authenticated and request.user.role == 'admin'
+        # Superuser ba admin role — duitai allow.
+        return request.user and request.user.is_authenticated and (
+            request.user.role == 'admin' or request.user.is_superuser
+        )
 
 class IsFacultyUser(permissions.BasePermission):
     def has_permission(self, request, view):
