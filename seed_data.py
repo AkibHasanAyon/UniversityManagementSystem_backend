@@ -15,6 +15,7 @@ django.setup()
 
 from users.models import User, Student, Faculty
 from academic.models import Course, FacultyCourseAssignment, Enrollment, Grade
+import random
 
 
 def seed():
@@ -69,6 +70,20 @@ def seed():
             'join_date': '2021-09-01',
         },
     ]
+
+    first_names = ["Ali", "Tahmid", "Sadia", "Nusrat", "Farhan", "Mahmud", "Rubel", "Sakib", "Tamim", "Mehedi", "Taskin", "Zakir", "Ebadot", "Suma", "Tariq", "Hasan", "Rina", "Mina", "Tina", "Bina", "Joti", "Rumi", "Sumi", "Lima"]
+    last_names = ["Rahman", "Hossain", "Islam", "Uddin", "Ahmed", "Khan", "Chowdhury", "Ali", "Hasan", "Mahmud", "Sikder", "Mirza", "Sheikh", "Talukder", "Molla"]
+
+    for i in range(4, 16):
+        faculty_data.append({
+            'email': f'faculty{i}@university.edu',
+            'first_name': 'Dr.',
+            'last_name': f'{random.choice(first_names)} {random.choice(last_names)}',
+            'faculty_id': f'FAC{i:03d}',
+            'department': random.choice(["Computer Science", "BBA", "EEE"]),
+            'specialization': 'General',
+            'join_date': f'20{random.randint(10, 24):02d}-01-01',
+        })
 
     faculty_objects = []
     for fd in faculty_data:
@@ -145,6 +160,18 @@ def seed():
             'gpa': '3.60',
         },
     ]
+
+    for i in range(6, 106):
+        major = random.choice(["Computer Science", "BBA", "EEE"])
+        student_data.append({
+            'email': f'student{i}@university.edu',
+            'first_name': random.choice(first_names),
+            'last_name': random.choice(last_names),
+            'student_id': f'STU{i:03d}',
+            'major': major,
+            'year': random.choice(["1st", "2nd", "3rd", "4th"]),
+            'gpa': f'{random.uniform(2.5, 4.0):.2f}',
+        })
 
     student_objects = []
     for sd in student_data:
@@ -262,6 +289,19 @@ def seed():
         },
     ]
 
+    cse_courses = [('CS101', 'Intro to CS'), ('CS102', 'Programming Fundamentals'), ('CS202', 'OOP'), ('CS303', 'Operating Systems'), ('CS304', 'Networking'), ('CS401', 'Artificial Intelligence'), ('CS402', 'Machine Learning'), ('CS405', 'Web Development')]
+    bba_courses = [('BBA101', 'Intro to Business'), ('BBA102', 'Accounting'), ('BBA201', 'Marketing'), ('BBA202', 'Finance'), ('BBA301', 'HRM'), ('BBA302', 'Business Law'), ('BBA401', 'Strategy')]
+    eee_courses = [('EEE101', 'Circuit Theory'), ('EEE102', 'Electronics I'), ('EEE201', 'Signals'), ('EEE202', 'Electromagnetics'), ('EEE301', 'Microprocessors'), ('EEE302', 'Power Systems'), ('EEE401', 'Control Systems')]
+
+    for code, name in cse_courses:
+        course_data.append({'code': code, 'name': name, 'department': 'Computer Science', 'credits': 3, 'semester': 'Fall 2025', 'days': ['Mon', 'Wed'], 'start_time': '10:00', 'end_time': '11:30', 'room': '101', 'building': 'Academic Block A'})
+
+    for code, name in bba_courses:
+        course_data.append({'code': code, 'name': name, 'department': 'BBA', 'credits': 3, 'semester': 'Fall 2025', 'days': ['Tue', 'Thu'], 'start_time': '12:00', 'end_time': '13:30', 'room': '201', 'building': 'Arts Block C'})
+
+    for code, name in eee_courses:
+        course_data.append({'code': code, 'name': name, 'department': 'EEE', 'credits': 3, 'semester': 'Fall 2025', 'days': ['Mon', 'Wed'], 'start_time': '14:00', 'end_time': '15:30', 'room': '301', 'building': 'Science Block B'})
+
     course_objects = []
     for cd in course_data:
         course, _ = Course.objects.get_or_create(
@@ -297,6 +337,20 @@ def seed():
         FacultyCourseAssignment.objects.get_or_create(faculty=fac, course=course)
         print(f"  ✅ Assignment: {fac_id} → {course_code}")
 
+    # Randomly assign faculty to other courses based on department
+    print("  Assigning remaining courses to faculty...")
+    all_faculties = Faculty.objects.all()
+    all_courses = Course.objects.all()
+    for course in all_courses:
+        if not FacultyCourseAssignment.objects.filter(course=course).exists():
+            dept_faculties = all_faculties.filter(department=course.department)
+            if dept_faculties.exists():
+                fac = random.choice(list(dept_faculties))
+            else:
+                fac = random.choice(list(all_faculties))
+            FacultyCourseAssignment.objects.get_or_create(faculty=fac, course=course)
+            print(f"  ✅ Random Assignment: {fac.faculty_id} → {course.code}")
+
     # ─── Enrollments ───────────────────────────────────────────────
     # Current semester enrollments
     enrollments = [
@@ -326,6 +380,20 @@ def seed():
         course = Course.objects.get(code=course_code)
         Enrollment.objects.get_or_create(student=student, course=course)
         print(f"  ✅ Past Enrollment: {stu_id} → {course_code}")
+
+    print("  Assigning random courses to students...")
+    all_students = Student.objects.all()
+    all_courses = Course.objects.all()
+
+    for student in all_students:
+        if not Enrollment.objects.filter(student=student).exists():
+            major_courses = list(all_courses.filter(department=student.major))
+            if major_courses:
+                num_courses = min(len(major_courses), random.randint(3, 5))
+                selected_courses = random.sample(major_courses, num_courses)
+                for course in selected_courses:
+                    Enrollment.objects.get_or_create(student=student, course=course)
+    print("  ✅ Random enrollments assigned successfully!")
 
     # ─── Grades (for past courses — so history has data) ───────────
     past_grades = [
