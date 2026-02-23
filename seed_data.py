@@ -293,14 +293,26 @@ def seed():
     bba_courses = [('BBA101', 'Intro to Business'), ('BBA102', 'Accounting'), ('BBA201', 'Marketing'), ('BBA202', 'Finance'), ('BBA301', 'HRM'), ('BBA302', 'Business Law'), ('BBA401', 'Strategy')]
     eee_courses = [('EEE101', 'Circuit Theory'), ('EEE102', 'Electronics I'), ('EEE201', 'Signals'), ('EEE202', 'Electromagnetics'), ('EEE301', 'Microprocessors'), ('EEE302', 'Power Systems'), ('EEE401', 'Control Systems')]
 
-    for code, name in cse_courses:
-        course_data.append({'code': code, 'name': name, 'department': 'Computer Science', 'credits': 3, 'semester': 'Fall 2025', 'days': ['Mon', 'Wed'], 'start_time': '10:00', 'end_time': '11:30', 'room': '101', 'building': 'Academic Block A'})
+    timeslots = [('08:00', '09:30'), ('10:00', '11:30'), ('12:00', '13:30'), ('14:00', '15:30'), ('16:00', '17:30')]
+    days_options = [['Mon', 'Wed'], ['Tue', 'Thu']]
+    rooms = ['101', '102', '103', '201', '202', '301', '302']
+    buildings = ['Academic Block A', 'Arts Block C', 'Science Block B']
+    
+    available_schedules = [(d, t[0], t[1], r, b) for d in days_options for t in timeslots for r in rooms for b in buildings]
+    random.shuffle(available_schedules)
 
-    for code, name in bba_courses:
-        course_data.append({'code': code, 'name': name, 'department': 'BBA', 'credits': 3, 'semester': 'Fall 2025', 'days': ['Tue', 'Thu'], 'start_time': '12:00', 'end_time': '13:30', 'room': '201', 'building': 'Arts Block C'})
+    all_new_courses = (
+        [(code, name, 'Computer Science') for code, name in cse_courses] +
+        [(code, name, 'BBA') for code, name in bba_courses] +
+        [(code, name, 'EEE') for code, name in eee_courses]
+    )
 
-    for code, name in eee_courses:
-        course_data.append({'code': code, 'name': name, 'department': 'EEE', 'credits': 3, 'semester': 'Fall 2025', 'days': ['Mon', 'Wed'], 'start_time': '14:00', 'end_time': '15:30', 'room': '301', 'building': 'Science Block B'})
+    for code, name, dept in all_new_courses:
+        schedule = available_schedules.pop()
+        course_data.append({
+            'code': code, 'name': name, 'department': dept, 'credits': 3, 'semester': 'Fall 2025',
+            'days': schedule[0], 'start_time': schedule[1], 'end_time': schedule[2], 'room': schedule[3], 'building': schedule[4]
+        })
 
     course_objects = []
     for cd in course_data:
@@ -389,11 +401,23 @@ def seed():
         if not Enrollment.objects.filter(student=student).exists():
             major_courses = list(all_courses.filter(department=student.major))
             if major_courses:
-                num_courses = min(len(major_courses), random.randint(3, 5))
-                selected_courses = random.sample(major_courses, num_courses)
-                for course in selected_courses:
+                random.shuffle(major_courses)
+                enrolled_courses = []
+                target_courses = random.randint(3, 5)
+                for course in major_courses:
+                    clash = False
+                    for ec in enrolled_courses:
+                        if any(day in ec.days for day in course.days):
+                            if course.start_time == ec.start_time:
+                                clash = True
+                                break
+                    if not clash:
+                        enrolled_courses.append(course)
+                        if len(enrolled_courses) >= target_courses:
+                            break
+                for course in enrolled_courses:
                     Enrollment.objects.get_or_create(student=student, course=course)
-    print("  ✅ Random enrollments assigned successfully!")
+    print("  ✅ Random non-clashing enrollments assigned successfully!")
 
     # ─── Grades (for past courses — so history has data) ───────────
     past_grades = [
@@ -413,6 +437,24 @@ def seed():
             defaults={'grade': grade_val, 'graded_by': faculty}
         )
         print(f"  ✅ Grade: {stu_id} → {course_code} = {grade_val}")
+
+    print("  Adding more random grades...")
+    all_enrollments = list(Enrollment.objects.all())
+    random.shuffle(all_enrollments)
+    grades_added = 0
+    grade_choices = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F']
+    for enrollment in all_enrollments:
+        if grades_added >= 60:
+            break
+        assignment = FacultyCourseAssignment.objects.filter(course=enrollment.course).first()
+        if assignment:
+            Grade.objects.get_or_create(
+                student=enrollment.student,
+                course=enrollment.course,
+                defaults={'grade': random.choice(grade_choices), 'graded_by': assignment.faculty}
+            )
+            grades_added += 1
+    print(f"  ✅ Added {grades_added} random grades.")
 
     print("\n🎉 Seeding complete!")
     print("\n📋 Login credentials:")
